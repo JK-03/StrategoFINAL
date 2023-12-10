@@ -2,6 +2,8 @@ package Stratego;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -93,7 +95,7 @@ public class GameBoard extends JFrame {
         }
     }
 
-    public GameBoard(ArrayList<UsuariosInfo> listaUsuariosExterna, ArrayList<LogsInfo> listaLogsExterna, String nombreUsuario, ArrayList<UsuariosEliminadosInfo> listaUsuariosEliminadosExterna, boolean ModoJuego) {
+    public GameBoard (ArrayList<UsuariosInfo> listaUsuariosExterna, ArrayList<LogsInfo> listaLogsExterna, String nombreUsuario, ArrayList<UsuariosEliminadosInfo> listaUsuariosEliminadosExterna, boolean ModoJuego) {
         // Inicialización de variables de la clase
         modoTutorial = ModoJuego;
         usuarioGPerfil = nombreUsuario;
@@ -110,6 +112,7 @@ public class GameBoard extends JFrame {
             isHeroTurn = false;
         }
 
+        /*
         // Selección del segundo usuario
         String[] nombreUsuarios2 = new String[listaUsuarios.size() - 1];
         int cont = 0;
@@ -129,6 +132,7 @@ public class GameBoard extends JFrame {
             // Puedes establecer un valor por defecto para usuario2 o manejarlo de otra manera según tu lógica
             usuario2 = ""; // O establecer algún valor por defecto
         }
+        */
 
         // Configuración del JFrame
         setTitle("Stratego - Marvel Heroes");
@@ -143,6 +147,7 @@ public class GameBoard extends JFrame {
         // Inicialización de los botones del tablero de juego
         characters = InitCharacters.getInstance().getCharacters();
         loadOriginalButtonImages();
+        
         // confirmEndTurnHideCards.addActionListener(e -> toggleCardVisibility());
         for (int row = 0; row < 10; row++) {
             for (int col = 0; col < 10; col++) {
@@ -225,69 +230,75 @@ public class GameBoard extends JFrame {
     }
 
     private JButton createGameSpace(int row, int col) {
-        JButton button = new JButton() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                for (Character character : characters) {
-                    if (character.isAlive() && character.getX() == row && character.getY() == col) {
-                        ImageIcon image = character.getImage();
-                        if (image != null) {
-                            // Calculate the position to center the image
-                            int x = (getWidth() - image.getIconWidth()) / 2;
-                            int y = (getHeight() - image.getIconHeight()) / 2;
+    JButton button = new JButton() {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            // Itera sobre los personajes para encontrar el que ocupa esta posición en el tablero
+            for (Character character : characters) {
+                if (character.isAlive() && character.getX() == row && character.getY() == col) {
+                    ImageIcon image = character.getImage();
+                    if (image != null) {
+                        // Calcula la posición para centrar la imagen
+                        int x = (getWidth() - image.getIconWidth()) / 2;
+                        int y = (getHeight() - image.getIconHeight()) / 2;
+                        // Dibuja la imagen en la posición calculada
+                        g.drawImage(image.getImage(), x, y, null);
 
-                            // Draw the image at the calculated position
-                            g.drawImage(image.getImage(), x, y, null);
+                        // Establece el borde azul si es un héroe, rojo si no lo es
+                        if (character.isHero()) {
+                            setBorder(BorderFactory.createLineBorder(Color.BLUE, 1));
+                        } else {
+                            setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+                        }
 
-                            // Pinta el borde de azul si es un héroe, de rojo si no lo es
-                            if (character.isHero()) {
-                                setBorder(BorderFactory.createLineBorder(Color.BLUE, 1));
-                            } else {
-                                setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-                            }
-
-                            // Si el personaje es el seleccionado, pinta el borde de verde
-                            if (character == selectedCharacter) {
-                                setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
-                            }
+                        // Si el personaje está seleccionado, establece el borde verde
+                        if (character == selectedCharacter) {
+                            setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
                         }
                     }
                 }
             }
-
-            @Override
-            public Dimension getPreferredSize() {
-                return new Dimension(50, 50);
-            }
-
-            @Override
-            public Dimension getMinimumSize() {
-                return new Dimension(50, 50);
-            }
-
-            @Override
-            public Dimension getMaximumSize() {
-                return new Dimension(50, 50);
-            }
-        };
-
-        // Check if the space is within the forbidden zones
-        boolean isYellowZone = (row >= 4 && row <= 5 && col >= 2 && col <= 3);
-        boolean isMagentaZone = (row >= 4 && row <= 5 && col >= 6 && col <= 7);
-
-        if (isYellowZone || isMagentaZone) {
-            // Set color for forbidden zones (yellow and magenta)
-            button.setBackground(isYellowZone ? Color.RED : Color.RED);
-            button.setEnabled(false); // Disable buttons in forbidden zones
         }
-        
-        // Add action listener for button clicks (you can customize this based on your
-        // needs)
-        button.addActionListener(e -> handleButtonClick(row, col));
 
-        return button;
+        @Override
+        public Dimension getPreferredSize() {
+            return new Dimension(50, 50);
+        }
+
+        @Override
+        public Dimension getMinimumSize() {
+            return new Dimension(50, 50);
+        }
+
+        @Override
+        public Dimension getMaximumSize() {
+            return new Dimension(50, 50);
+        }
+    };
+
+    // Verifica si la posición está en una zona prohibida (amarilla o magenta)
+    boolean isYellowZone = (row >= 4 && row <= 5 && col >= 2 && col <= 3);
+    boolean isMagentaZone = (row >= 4 && row <= 5 && col >= 6 && col <= 7);
+
+    if (isYellowZone || isMagentaZone) {
+        // Establece el color de fondo para las zonas prohibidas (amarillo o magenta)
+        button.setBackground(isYellowZone ? Color.RED : Color.RED);
+        // Agrega un ActionListener para mostrar un mensaje de advertencia al hacer clic en una zona prohibida
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(null, "¡Zona prohibida!", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            }
+        });
+    } else {
+        // Si no está en una zona prohibida, agrega un ActionListener para manejar el clic en los botones del tablero
+        button.addActionListener(e -> handleButtonClick(row, col));
     }
+
+    return button;
+}
+
 
     private Character selectedCharacter = null;
 
