@@ -12,7 +12,6 @@ import javax.swing.JFrame;
  */
 
 /**
- *
  * @author jenniferbueso
  */
 public class Ranking extends javax.swing.JFrame {

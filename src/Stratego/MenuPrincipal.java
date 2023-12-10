@@ -7,7 +7,6 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 /**
- *
  * @author jenniferbueso
  */
 public class MenuPrincipal extends javax.swing.JFrame {

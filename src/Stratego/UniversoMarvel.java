@@ -10,7 +10,6 @@ import javax.swing.JFrame;
  */
 
 /**
- *
  * @author jenniferbueso
  */
 public class UniversoMarvel extends javax.swing.JFrame {

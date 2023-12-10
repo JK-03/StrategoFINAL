@@ -14,7 +14,6 @@ import javax.swing.JOptionPane;
  */
 
 /**
- *
  * @author jenniferbueso
  */
 public class MiPerfil extends javax.swing.JFrame {

@@ -19,8 +19,8 @@ public class GameBoard extends JFrame {
     // display eliminated characters
     private JButton[] eliminatedHeroesButton = new JButton[40];
     private JButton[] eliminatedVillainsButton = new JButton[40];
-    private String cardBackgroundImages = "./src/stratego/images/Who_question_mark.png"; // Array to hold card
-                                                                                         // background images
+    private String cardBackgroundImagesV = "./src/stratego/images/VillanosClasico.png"; // Array to hold card
+    private String cardBackgroundImagesH = "./src/stratego/images/HeroesClasico.png";
     private String[] originalButtonImages;
     private boolean isHeroTurn = true;
     private ArrayList<Character> heroes = new ArrayList<>();
@@ -64,15 +64,8 @@ public class GameBoard extends JFrame {
 
     public GameBoard(Boolean isTutorial) {
         this.isTutorial = isTutorial;
-        Object[] options = { "YES", "NO" };
-        int n = JOptionPane.showOptionDialog(this,
-                "¿Quieres jugar con heroes?",
-                "Confirmar bando",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                options,
-                options[1]);
+        Object[] options = { "Heroes", "Villano" };
+        int n = JOptionPane.showOptionDialog(this, "¿Con qué bando quieres jugar?", "Elegir  bando", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 
         if (n != JOptionPane.YES_OPTION) {
             isHeroTurn = false;
@@ -612,7 +605,7 @@ public class GameBoard extends JFrame {
         int contCharacterHero = 0;
         if (isHeroTurn) {
             for (Character character : heroes) {
-                character.setImage(cardBackgroundImages);
+                character.setImage(cardBackgroundImagesH);
             }
             // reset to default values
             for (Character character : villains) {
@@ -623,7 +616,7 @@ public class GameBoard extends JFrame {
         }
         if (!isHeroTurn) {
             for (Character character : villains) {
-                character.setImage(cardBackgroundImages);
+                character.setImage(cardBackgroundImagesV);
             }
             // reset to default values
             for (Character character : heroes) {

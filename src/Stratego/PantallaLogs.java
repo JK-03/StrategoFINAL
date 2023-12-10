@@ -10,7 +10,6 @@ import javax.swing.JFrame;
  */
 
 /**
- *
  * @author jenniferbueso
  */
 public class PantallaLogs extends javax.swing.JFrame {
@@ -66,7 +65,7 @@ public class PantallaLogs extends javax.swing.JFrame {
         LogsSalida.setRows(5);
         jScrollPane1.setViewportView(LogsSalida);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 220, 400, 250));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 220, 560, 270));
 
         BotonRegresar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/FondosInterfaz/BotonRegresar.png"))); // NOI18N
         BotonRegresar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));

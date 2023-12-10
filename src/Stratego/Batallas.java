@@ -9,7 +9,6 @@ import javax.swing.JFrame;
  */
 
 /**
- *
  * @author jenniferbueso
  */
 public class Batallas extends javax.swing.JFrame {

@@ -7,7 +7,6 @@ package Stratego;
 
 
 /**
- *
  * @author jenniferbueso
  */
 public class LogsInfo {
