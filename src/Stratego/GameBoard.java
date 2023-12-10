@@ -283,7 +283,7 @@ public class GameBoard extends JFrame {
 
     if (isYellowZone || isMagentaZone) {
         // Establece el color de fondo para las zonas prohibidas (amarillo o magenta)
-        button.setBackground(isYellowZone ? Color.RED : Color.RED);
+        button.setBackground(Color.RED);
         // Agrega un ActionListener para mostrar un mensaje de advertencia al hacer clic en una zona prohibida
         button.addActionListener(new ActionListener() {
             @Override
@@ -299,18 +299,21 @@ public class GameBoard extends JFrame {
     return button;
 }
 
-
     private Character selectedCharacter = null;
 
     private void handleButtonClick(int row, int col) {
-        System.out.println("Clicked on row " + row + ", column " + col);
+        // Muestra información en la consola sobre la fila y columna del botón seleccionado
+        System.out.println("Clic en la fila " + row + ", columna " + col);
+
+        // Indica que el juego ha comenzado
         gameHasInit = true;
 
-        // Resto del código...
-
+        // Verifica si hay un personaje seleccionado
         if (selectedCharacter != null) {
+            // Maneja el movimiento del personaje si ya hay uno seleccionado
             handleCharacterMove(row, col);
         } else {
+            // Maneja la selección de un personaje si no hay uno seleccionado
             handleCharacterSelection(row, col);
         }
     }
@@ -496,27 +499,25 @@ public class GameBoard extends JFrame {
                                 isHeroTurn = !isHeroTurn;
                             } else if (selectedCharacter.getPowerRating() == targetCharacter.getPowerRating()) {
                                 // Si tienen el mismo powerRating, se eliminan solas
+                                JOptionPane.showMessageDialog(null, "¡Empate! Ambas cartas eran el mismo rango.");
+                                
                                 List<Character> charactersToEliminate = new ArrayList<>();
                                 charactersToEliminate.add(targetCharacter);
-                                buttons[targetCharacter.getX()][targetCharacter.getY()]
-                                        .setBorder(BorderFactory.createLineBorder(Color.black, 1));
+                                buttons[targetCharacter.getX()][targetCharacter.getY()].setBorder(BorderFactory.createLineBorder(Color.black, 1));
                                 charactersToEliminate.add(selectedCharacter);
-                                buttons[selectedCharacter.getX()][selectedCharacter.getY()]
-                                        .setBorder(BorderFactory.createLineBorder(Color.black, 1));
+                                buttons[selectedCharacter.getX()][selectedCharacter.getY()].setBorder(BorderFactory.createLineBorder(Color.black, 1));
                                 for (Character character : charactersToEliminate) {
                                     eliminateCharacter(character, false, true);
                                 }
-
+                                
                                 selectedCharacter = null; // Permitir la selección de otra pieza
                                 if (!modoTutorial) {
                                     changeCardBackgrounds();
-
                                 }
                                 updatePanels();
                                 revalidate();
                                 repaint();
                                 isHeroTurn = !isHeroTurn;
-                                // updateEliminatedCharactersWindows();
 
                             } else if (selectedCharacter.getPowerRating() == 1) {
                                 // saveTheEarth();
