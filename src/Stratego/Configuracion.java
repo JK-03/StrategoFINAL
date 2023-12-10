@@ -105,7 +105,7 @@ public class Configuracion extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void BotonRegresarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonRegresarMouseClicked
-        MenuPrincipal menuPrincipal = new MenuPrincipal(this.listaUsuarios,this.listaLogs, usuarioGPerfil,this.listaUsuariosEliminados,modoTutorial);
+        MenuPrincipal menuPrincipal = new MenuPrincipal(this.listaUsuarios,this.listaLogs, usuarioGPerfil,this.listaUsuariosEliminados, this.modoTutorial);
         menuPrincipal.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_BotonRegresarMouseClicked

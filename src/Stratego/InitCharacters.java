@@ -267,9 +267,9 @@ public class InitCharacters {
         characters = _characters;
 
         // Tierra
-        characters[0] = new Character("Tierra", true, true, 0, "./src/Stratego/images/-10.png");
+        characters[0] = new Character("Tierra", true, true, 0, "./src/Stratego/images/11.png");
         // Héroe de Tierra
-        characters[1] = new Character("Planet Tierra", false, true, 0, "./src/Stratego/images/11.png");
+        characters[1] = new Character("Planet Tierra", false, true, 0, "./src/Stratego/images/-10.png");
 
         // Piezas Bombas
         characters[2] = new Character("Pumpkin Bomb", false, true, 11, "./src/Stratego/images/-25.png");
@@ -344,7 +344,7 @@ public class InitCharacters {
         // Rango 7
         // Villanos PR 5
         characters[50] = new Character("Deadpool", false, true, 5, "./src/Stratego/images/-7.png");
-        characters[51] = new Character("Dr Octopus", false, true, 5, "./src/Stratego/images/octopus.png"); // Add the
+        characters[51] = new Character("Dr Octopus", false, true, 5, "./src/Stratego/images/-9.png"); // Add the
                                                                                                            // image name
         characters[52] = new Character("Mysterio", false, true, 5, "./src/Stratego/images/-21.png");
         characters[53] = new Character("Mystique", false, true, 5, "./src/Stratego/images/-22.png");

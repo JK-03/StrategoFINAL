@@ -12,6 +12,14 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class GameBoard extends JFrame {
+    ArrayList<UsuariosInfo> listaUsuarios;
+    ArrayList<LogsInfo> listaLogs;
+    ArrayList<UsuariosEliminadosInfo> listaUsuariosEliminados;
+    
+    //Atributos por Default de la Cuenta
+    String usuarioGPerfil, usuario2;
+    private boolean modoTutorial = true;
+    
     // Array para almacenar personajes
     private Character[] characters;
 
@@ -52,9 +60,6 @@ public class GameBoard extends JFrame {
     // Bandera que indica si el juego ha terminado por falta de piezas
     private boolean gameEndedOnNoPieces = false;
 
-    // Bandera que indica si es un tutorial
-    private boolean isTutorial = false;
-
     // Panel para héroes y villanos eliminados con disposición de cuadrícula 10x10
     JPanel eliminatedHeroesPanel = new JPanel(new GridLayout(10, 10));
     JPanel eliminatedVillainsPanel = new JPanel(new GridLayout(10, 10));
@@ -88,32 +93,54 @@ public class GameBoard extends JFrame {
         }
     }
 
-    public GameBoard(Boolean isTutorial) {
-        this.isTutorial = isTutorial;
-        Object[] options = { "YES", "NO" };
-        int n = JOptionPane.showOptionDialog(this,
-                "¿Quieres jugar con heroes?",
-                "Confirmar bando",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                options,
-                options[1]);
+    public GameBoard(ArrayList<UsuariosInfo> listaUsuariosExterna, ArrayList<LogsInfo> listaLogsExterna, String nombreUsuario, ArrayList<UsuariosEliminadosInfo> listaUsuariosEliminadosExterna, boolean ModoJuego) {
+        // Inicialización de variables de la clase
+        modoTutorial = ModoJuego;
+        usuarioGPerfil = nombreUsuario;
+        this.listaUsuarios = listaUsuariosExterna;
+        this.listaLogs = listaLogsExterna;
+        this.listaUsuariosEliminados = listaUsuariosEliminadosExterna;
+        this.modoTutorial = ModoJuego;
+
+        // Selección del bando
+        Object[] options = { "Héroes", "Villanos" };
+        int n = JOptionPane.showOptionDialog(this, "¿Con qué bando prefieres jugar?", "Elegir bando", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 
         if (n != JOptionPane.YES_OPTION) {
             isHeroTurn = false;
         }
+
+        // Selección del segundo usuario
+        String[] nombreUsuarios2 = new String[listaUsuarios.size() - 1];
+        int cont = 0;
+        for (int i = 0; i < listaUsuarios.size(); i++) {
+            if (!listaUsuarios.get(i).getUsuarioG().equals(this.usuarioGPerfil)) {
+                nombreUsuarios2[cont] = listaUsuarios.get(i).getUsuarioG();
+                cont++;
+            }
+        }
+
+        if (cont > 0) {
+            usuario2 = (String) JOptionPane.showInputDialog(null, "Escoja el usuario", "", JOptionPane.QUESTION_MESSAGE, null, nombreUsuarios2, nombreUsuarios2[0]);
+        } else {
+            // No hay usuarios disponibles para seleccionar
+            JOptionPane.showMessageDialog(null, "No hay usuarios disponibles para seleccionar.", "Error", JOptionPane.ERROR_MESSAGE);
+
+            // Puedes establecer un valor por defecto para usuario2 o manejarlo de otra manera según tu lógica
+            usuario2 = ""; // O establecer algún valor por defecto
+        }
+
+        // Configuración del JFrame
         setTitle("Stratego - Marvel Heroes");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout()); // Use BorderLayout for main layout
+        setLayout(new BorderLayout()); // Utiliza BorderLayout para el diseño principal
 
-        // Panel for game board
+        // Panel para el tablero de juego
         JPanel gameBoardPanel = new JPanel(new GridLayout(10, 10));
         gameBoardPanel.setPreferredSize(new Dimension(1200, 800));
-        // gameBoardPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); //
-        // Add space around the game board
+        // gameBoardPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Agrega espacio alrededor del tablero de juego
 
-        // Initialize the game board buttons
+        // Inicialización de los botones del tablero de juego
         characters = InitCharacters.getInstance().getCharacters();
         loadOriginalButtonImages();
         // confirmEndTurnHideCards.addActionListener(e -> toggleCardVisibility());
@@ -125,33 +152,31 @@ public class GameBoard extends JFrame {
             }
         }
 
-        // Add the game board panel to the center
+        // Agrega el panel del tablero de juego al centro
         add(gameBoardPanel, BorderLayout.CENTER);
-        // Add action listener to resignGame button
 
-        // Styling and adding buttons
-        // styleButton(confirmEndTurnHideCards, Color.GREEN, new Font("Arial",
-        // Font.BOLD, 14));
+        // Agrega un ActionListener al botón resignGame
         styleButton(resignGame, Color.RED, new Font("Arial", Font.BOLD, 14));
-
-        // Add buttons to the frame
-        // add(confirmEndTurnHideCards, BorderLayout.SOUTH);
         add(resignGame, BorderLayout.NORTH);
-        if (isTutorial) {
+        if (modoTutorial) {
 
         }
+
+        // Actualiza los paneles
         updatePanels();
 
+        // Configuración del área de texto
         JTextArea textArea = new JTextArea(24, 80);
-        textArea.setEditable(false); // Hacer que el área de texto no sea editable
+        textArea.setEditable(false); // Hace que el área de texto no sea editable
         JScrollPane scrollPane = new JScrollPane(textArea);
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
-        // String startTurn = !isHeroTurn ? "Heroes" : "Villain";
+
+        // ActionListener para el botón resignGame
         resignGame.addActionListener(e -> endGame());
     }
-
+    
     public void updatePanels() {
         eliminatedHeroesPanel.removeAll(); // Remove all existing components from the panel
         eliminatedHeroesPanel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 10));
@@ -253,10 +278,10 @@ public class GameBoard extends JFrame {
 
         if (isYellowZone || isMagentaZone) {
             // Set color for forbidden zones (yellow and magenta)
-            button.setBackground(isYellowZone ? Color.YELLOW : Color.MAGENTA);
+            button.setBackground(isYellowZone ? Color.RED : Color.RED);
             button.setEnabled(false); // Disable buttons in forbidden zones
         }
-
+        
         // Add action listener for button clicks (you can customize this based on your
         // needs)
         button.addActionListener(e -> handleButtonClick(row, col));
@@ -301,6 +326,7 @@ public class GameBoard extends JFrame {
                 moveCharacter(row, col);
 
                 isHeroTurn = !isHeroTurn;
+                
             } else if (isAdjacent || selectedCharacter.getPowerRating() == 2) {
                 Character targetCharacter = getCharacterAtLocation(row, col);
 
@@ -310,12 +336,7 @@ public class GameBoard extends JFrame {
                         ImageIcon selectedImage = selectedCharacter.getImage();
                         ImageIcon targetImage = targetCharacter.getImage();
                         Object[] message = {
-                            "¿Estás seguro de que quieres luchar?",
-                            "Personaje seleccionado:",
-                            new JLabel(selectedImage),
-                            "Personaje objetivo:",
-                            new JLabel(targetImage)
-                        };
+                            "¿Estás seguro de que quieres luchar?", "Personaje seleccionado:", new JLabel(selectedImage), "Personaje objetivo:", new JLabel(targetImage)};
                         int n = JOptionPane.showOptionDialog(this,
                                 message,
                                 "Confirmar lucha",
@@ -342,19 +363,16 @@ public class GameBoard extends JFrame {
                                     // Si tienen el mismo powerRating, se eliminan solas
                                     List<Character> charactersToEliminate = new ArrayList<>();
                                     charactersToEliminate.add(targetCharacter);
-                                    buttons[targetCharacter.getX()][targetCharacter.getY()]
-                                            .setBorder(BorderFactory.createLineBorder(Color.black, 1));
+                                    buttons[targetCharacter.getX()][targetCharacter.getY()].setBorder(BorderFactory.createLineBorder(Color.black, 1));
                                     charactersToEliminate.add(selectedCharacter);
-                                    buttons[selectedCharacter.getX()][selectedCharacter.getY()]
-                                            .setBorder(BorderFactory.createLineBorder(Color.black, 1));
+                                    buttons[selectedCharacter.getX()][selectedCharacter.getY()].setBorder(BorderFactory.createLineBorder(Color.black, 1));
                                     for (Character character : charactersToEliminate) {
                                         eliminateCharacter(character, false, true);
                                     }
 
                                     selectedCharacter = null; // Permitir la selección de otra pieza
-                                    if (!isTutorial) {
+                                    if (!modoTutorial) {
                                         changeCardBackgrounds();
-
                                     }
                                     updatePanels();
                                     revalidate();
@@ -409,9 +427,8 @@ public class GameBoard extends JFrame {
                                             }
 
                                             selectedCharacter = null; // Allow another piece to be selected
-                                            if (!isTutorial) {
+                                            if (!modoTutorial) {
                                                 changeCardBackgrounds();
-
                                             }
                                             updatePanels();
                                             revalidate();
@@ -428,7 +445,7 @@ public class GameBoard extends JFrame {
                                             eliminateCharacter(selectedCharacter, true, false);
                                             selectedCharacter = null; // Allow another piece to be selected
                                             revalidate();
-                                             if (!isTutorial) {
+                                             if (!modoTutorial) {
                                                 changeCardBackgrounds();
 
                                             }
@@ -458,7 +475,7 @@ public class GameBoard extends JFrame {
                                 // Si una pieza menor ataca a una mayor, se elimina sola
                                 eliminateCharacter(selectedCharacter, true, false);
                                 selectedCharacter = null; // Permitir la selección de otra pieza
-                                if (!isTutorial) {
+                                if (!modoTutorial) {
                                     changeCardBackgrounds();
 
                                 }
@@ -480,7 +497,7 @@ public class GameBoard extends JFrame {
                                 }
 
                                 selectedCharacter = null; // Permitir la selección de otra pieza
-                                if (!isTutorial) {
+                                if (!modoTutorial) {
                                     changeCardBackgrounds();
 
                                 }
@@ -575,7 +592,7 @@ public class GameBoard extends JFrame {
 
         selectedCharacter = null;
         revalidate();
-        if (!isTutorial) {
+        if (!modoTutorial) {
             changeCardBackgrounds();
         }
         repaint();
@@ -615,7 +632,7 @@ public class GameBoard extends JFrame {
                 villainsScore += 5;
             }
             // GameBoard();
-            if (isTutorial) {
+            if (modoTutorial) {
 
             }
             updatePanels();
@@ -636,6 +653,7 @@ public class GameBoard extends JFrame {
     private void changeCardBackgrounds() {
         int contCharacterVillain = 0;
         int contCharacterHero = 0;
+        
         if (isHeroTurn) {
             for (Character character : heroes) {
                 character.setImage(cardBackgroundImagesH);
@@ -660,6 +678,6 @@ public class GameBoard extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new GameBoard(false));
+        SwingUtilities.invokeLater(() -> new GameBoard(null, null, null, null, true));
     }
 }

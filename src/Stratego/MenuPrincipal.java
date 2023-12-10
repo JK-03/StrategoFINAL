@@ -17,11 +17,12 @@ public class MenuPrincipal extends javax.swing.JFrame {
     String nombreUsuario;
     
     //Atributos por Default de la Cuenta
+    String usuarioGPerfil;
     private boolean modoTutorial = true;
     
     public MenuPrincipal(ArrayList<UsuariosInfo> listaUsuariosExterna, ArrayList<LogsInfo> listaLogsExterna, String nombreUsuario, ArrayList<UsuariosEliminadosInfo> listaUsuariosEliminadosExterna, boolean ModoJuego) {
         this.nombreUsuario = nombreUsuario;
-        
+        usuarioGPerfil = nombreUsuario;
         listaUsuarios = listaUsuariosExterna;
         listaLogs = listaLogsExterna;
         listaUsuariosEliminados = listaUsuariosEliminadosExterna;
@@ -158,20 +159,22 @@ public class MenuPrincipal extends javax.swing.JFrame {
         universoMarvel.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_BotonUniversoMarvelMouseClicked
+    
     private GameBoard gameBoard;
- private void BotonStrategoMouseClicked(java.awt.event.MouseEvent evt) {
-    if (listaUsuarios.size() < 2) {
-        JOptionPane.showMessageDialog(null, "Se requieren al menos dos usuarios para iniciar el juego. Por favor, cree más usuarios antes de comenzar.", "Error", JOptionPane.WARNING_MESSAGE);
-    } else {
-        if (gameBoard != null) {
-            gameBoard.close(); // Close the current game board
-        }
-        SwingUtilities.invokeLater(() -> {
-            gameBoard = new GameBoard(this.modoTutorial);
-            gameBoard.setVisible(true);
-        });
-    }
-}
+    
+    private void BotonStrategoMouseClicked(java.awt.event.MouseEvent evt) {
+       if (listaUsuarios.size() < 2) {
+           JOptionPane.showMessageDialog(null, "Se requieren al menos dos usuarios para iniciar el juego. Por favor, cree más usuarios antes de comenzar.", "Error", JOptionPane.WARNING_MESSAGE);
+       } else {
+           if (gameBoard != null) {
+               gameBoard.close(); // Close the current game board
+           }
+           SwingUtilities.invokeLater(() -> {
+               gameBoard = new GameBoard(this.listaUsuarios, this.listaLogs, nombreUsuario,this.listaUsuariosEliminados,this.modoTutorial);
+               gameBoard.setVisible(true);
+           });
+       }
+   }
 
     
     /**
