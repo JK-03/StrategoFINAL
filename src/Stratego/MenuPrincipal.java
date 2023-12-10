@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 /**
+ *
  * @author jenniferbueso
  */
 public class MenuPrincipal extends javax.swing.JFrame {
@@ -20,6 +21,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     
     public MenuPrincipal(ArrayList<UsuariosInfo> listaUsuariosExterna, ArrayList<LogsInfo> listaLogsExterna, String nombreUsuario, ArrayList<UsuariosEliminadosInfo> listaUsuariosEliminadosExterna, boolean ModoJuego) {
         this.nombreUsuario = nombreUsuario;
+        
         listaUsuarios = listaUsuariosExterna;
         listaLogs = listaLogsExterna;
         listaUsuariosEliminados = listaUsuariosEliminadosExterna;
@@ -31,12 +33,6 @@ public class MenuPrincipal extends javax.swing.JFrame {
         setSize(1180, 626);
         setLocationRelativeTo(null);
         setVisible(true);
-        
-        String usuariosEliminados = "";
-        for (int i = 0; i < this.listaUsuariosEliminados.size(); i++) {
-            usuariosEliminados += listaUsuariosEliminados.get(i).getUsuariosEliminado() + "\n";
-        }
-        System.out.println("Usuarios: " + usuariosEliminados);
         
         //Verificar Lista
         /*

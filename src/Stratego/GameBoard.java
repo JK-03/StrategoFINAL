@@ -12,27 +12,53 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class GameBoard extends JFrame {
+    // Array para almacenar personajes
     private Character[] characters;
-    private JButton[][] buttons = new JButton[10][10]; // Matriz de botones
-    // private JButton confirmEndTurnHideCards = new JButton("Confirm End Turn");
-    private JButton resignGame = new JButton("Resign Game");
-    // display eliminated characters
-    private JButton[] eliminatedHeroesButton = new JButton[40];
-    private JButton[] eliminatedVillainsButton = new JButton[40];
-    private String cardBackgroundImagesV = "./src/stratego/images/VillanosClasico.png"; // Array to hold card
+
+    // Matriz de botones
+    private JButton[][] buttons = new JButton[10][10];
+
+    // Botón para renunciar al juego
+    private JButton resignGame = new JButton("Renunciar al Juego");
+
+    // Mostrar personajes eliminados
+    private JButton[] eliminatedHeroesButton = new JButton[40];  // Array de botones para héroes eliminados
+    private JButton[] eliminatedVillainsButton = new JButton[40];  // Array de botones para villanos eliminados
+
+    // Ruta de las imágenes de fondo de las cartas para villanos y héroes
+    private String cardBackgroundImagesV = "./src/stratego/images/VillanosClasico.png";
     private String cardBackgroundImagesH = "./src/stratego/images/HeroesClasico.png";
+
+    // Array para almacenar imágenes originales de los botones
     private String[] originalButtonImages;
+
+    // Bandera que indica si es el turno del héroe
     private boolean isHeroTurn = true;
+
+    // Listas de héroes y villanos
     private ArrayList<Character> heroes = new ArrayList<>();
     private ArrayList<Character> villains = new ArrayList<>();
+
+    // Listas de imágenes originales para héroes y villanos
     private ArrayList<String> heroesOriginalImages = new ArrayList<>();
     private ArrayList<String> villainsOriginalImages = new ArrayList<>();
+
+    // Flujo de salida para imprimir
     private PrintStream printStream;
-    private Boolean gameHasInit = false;
-    private Boolean gameEndedOnNoPieces = false;
-    private Boolean isTutorial = false;
+
+    // Bandera que indica si el juego ha sido inicializado
+    private boolean gameHasInit = false;
+
+    // Bandera que indica si el juego ha terminado por falta de piezas
+    private boolean gameEndedOnNoPieces = false;
+
+    // Bandera que indica si es un tutorial
+    private boolean isTutorial = false;
+
+    // Panel para héroes y villanos eliminados con disposición de cuadrícula 10x10
     JPanel eliminatedHeroesPanel = new JPanel(new GridLayout(10, 10));
     JPanel eliminatedVillainsPanel = new JPanel(new GridLayout(10, 10));
+
 
     public void close() {
         InitCharacters.getInstance().setInitCharactersNull();
@@ -64,8 +90,15 @@ public class GameBoard extends JFrame {
 
     public GameBoard(Boolean isTutorial) {
         this.isTutorial = isTutorial;
-        Object[] options = { "Heroes", "Villano" };
-        int n = JOptionPane.showOptionDialog(this, "¿Con qué bando quieres jugar?", "Elegir  bando", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        Object[] options = { "YES", "NO" };
+        int n = JOptionPane.showOptionDialog(this,
+                "¿Quieres jugar con heroes?",
+                "Confirmar bando",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[1]);
 
         if (n != JOptionPane.YES_OPTION) {
             isHeroTurn = false;

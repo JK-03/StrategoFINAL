@@ -117,12 +117,10 @@ public class PantallaPrincipal extends javax.swing.JFrame {
 
         if (listaUsuariosExterna==null) {
             // Agregar algunos usuarios predeterminados
-            
             listaUsuarios.add(new UsuariosInfo("kris3", "kris3"));
             listaUsuarios.add(new UsuariosInfo("karla05", "12345"));
             listaUsuarios.add(new UsuariosInfo("lopez", "hola5"));
             listaUsuarios.add(new UsuariosInfo("a", "12345"));
-            
         }
     }
     
@@ -134,11 +132,9 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         this.listaUsuariosEliminados = (listaUsuariosEliminadosExterna == null) ? new ArrayList<>() : listaUsuariosEliminadosExterna;
 
         if (listaUsuariosEliminadosExterna == null) {
-            
             listaUsuariosEliminados.add(new UsuariosEliminadosInfo("kris3", "kris3"));
             listaUsuariosEliminados.add(new UsuariosEliminadosInfo("karla05", "12345"));
             listaUsuariosEliminados.add(new UsuariosEliminadosInfo("lopez", "hola5"));
-            
         }
 
         //Verificar Lista

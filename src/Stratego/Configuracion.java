@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
  */
 
 /**
+ *
  * @author jenniferbueso
  */
 public class Configuracion extends javax.swing.JFrame {
