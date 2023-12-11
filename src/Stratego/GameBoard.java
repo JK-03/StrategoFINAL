@@ -496,14 +496,14 @@ public class GameBoard extends JFrame {
                                     }
 
                                     selectedCharacter = null; // Permitir la selección de otra pieza
-                                    if (!modoTutorial) {
-                                        changeCardBackgrounds();
-                                    }
                                     updatePanels();
                                     revalidate();
                                     repaint();
                                     isHeroTurn = !isHeroTurn;
                                     updateTurnLabel();
+                                    if (!modoTutorial) {
+                                        changeCardBackgrounds();
+                                    }
                                     // updateEliminatedCharactersWindows();
 
                                 }
@@ -568,18 +568,20 @@ public class GameBoard extends JFrame {
                                             moveCharacter(row, col);
                                             isHeroTurn = !isHeroTurn;
                                             updateTurnLabel();
+                                            if (!modoTutorial) {
+                                                changeCardBackgrounds();
+                                            }
                                         } else {
                                             // The selected character has a lower power rating, so it is eliminated
                                             eliminateCharacter(selectedCharacter, true, false);
                                             selectedCharacter = null; // Allow another piece to be selected
                                             revalidate();
-                                            if (!modoTutorial) {
-                                                changeCardBackgrounds();
-
-                                            }
                                             repaint();
                                             isHeroTurn = !isHeroTurn;
                                             updateTurnLabel();
+                                            if (!modoTutorial) {
+                                                changeCardBackgrounds();
+                                            }
                                         }
                                     }
                                 } else {
@@ -599,19 +601,22 @@ public class GameBoard extends JFrame {
                                     eliminateCharacter(targetCharacter, false, false);
                                     moveCharacter(row, col);
                                     isHeroTurn = !isHeroTurn;
+                                    if (!modoTutorial) {
+                                    changeCardBackgrounds();
+                                }
                                     updateTurnLabel();
                                 }
                             } else if (selectedCharacter.getPowerRating() < targetCharacter.getPowerRating()) {
                                 // Si una pieza menor ataca a una mayor, se elimina sola
                                 eliminateCharacter(selectedCharacter, true, false);
                                 selectedCharacter = null; // Permitir la selección de otra pieza
-                                if (!modoTutorial) {
-                                    changeCardBackgrounds();
-                                }
                                 updatePanels();
                                 revalidate();
                                 repaint();
                                 isHeroTurn = !isHeroTurn;
+                                if (!modoTutorial) {
+                                    changeCardBackgrounds();
+                                }
                                 updateTurnLabel();
                             } else if (selectedCharacter.getPowerRating() == targetCharacter.getPowerRating()) {
                                 // Si tienen el mismo powerRating, se eliminan solas
@@ -619,23 +624,21 @@ public class GameBoard extends JFrame {
 
                                 List<Character> charactersToEliminate = new ArrayList<>();
                                 charactersToEliminate.add(targetCharacter);
-                                buttons[targetCharacter.getX()][targetCharacter.getY()]
-                                        .setBorder(BorderFactory.createLineBorder(Color.black, 1));
+                                buttons[targetCharacter.getX()][targetCharacter.getY()].setBorder(BorderFactory.createLineBorder(Color.black, 1));
                                 charactersToEliminate.add(selectedCharacter);
-                                buttons[selectedCharacter.getX()][selectedCharacter.getY()]
-                                        .setBorder(BorderFactory.createLineBorder(Color.black, 1));
+                                buttons[selectedCharacter.getX()][selectedCharacter.getY()].setBorder(BorderFactory.createLineBorder(Color.black, 1));
                                 for (Character character : charactersToEliminate) {
                                     eliminateCharacter(character, false, true);
                                 }
 
                                 selectedCharacter = null; // Permitir la selección de otra pieza
-                                if (!modoTutorial) {
-                                    changeCardBackgrounds();
-                                }
                                 updatePanels();
                                 revalidate();
                                 repaint();
                                 isHeroTurn = !isHeroTurn;
+                                if (!modoTutorial) {
+                                    changeCardBackgrounds();
+                                }
                                 updateTurnLabel();
 
                             } else if (selectedCharacter.getPowerRating() == 1) {
@@ -908,59 +911,17 @@ public class GameBoard extends JFrame {
     }
 
     private void changeCardBackgrounds() {
-        int contCharacterVillain = 0;
         int contCharacterHero = 0;
+        int contCharacterVillain = 0;
 
-        if (usuario1PTipoPartida == 0) {
-            // Juegan con héroes
-            if (isHeroTurn) {
-                // Es el turno de los héroes, ocultar las cartas de villanos
-                for (Character villain : villains) {
-                    villain.setImage(cardBackgroundImagesV);
-                }
+        for (Character hero : heroes) {
+            hero.setImage(isHeroTurn ? heroesOriginalImages.get(contCharacterHero) : cardBackgroundImagesH);
+            contCharacterHero++;
+        }
 
-                // Mostrar las cartas de héroes
-                for (Character hero : heroes) {
-                    hero.setImage(heroesOriginalImages.get(contCharacterHero));
-                    contCharacterHero++;
-                }
-            } else {
-                // Es el turno de los villanos, ocultar las cartas de héroes
-                for (Character hero : heroes) {
-                    hero.setImage(cardBackgroundImagesH);
-                }
-
-                // Mostrar las cartas de villanos
-                for (Character villain : villains) {
-                    villain.setImage(villainsOriginalImages.get(contCharacterVillain));
-                    contCharacterVillain++;
-                }
-            }
-        } else {
-            // Juegan con villanos
-            if (isHeroTurn) {
-                // Es el turno de los héroes, ocultar las cartas de villanos
-                for (Character villain : villains) {
-                    villain.setImage(cardBackgroundImagesV);
-                }
-
-                // Mostrar las cartas de héroes
-                for (Character hero : heroes) {
-                    hero.setImage(heroesOriginalImages.get(contCharacterHero));
-                    contCharacterHero++;
-                }
-            } else {
-                // Es el turno de los villanos, ocultar las cartas de héroes
-                for (Character hero : heroes) {
-                    hero.setImage(cardBackgroundImagesH);
-                }
-
-                // Mostrar las cartas de villanos
-                for (Character villain : villains) {
-                    villain.setImage(villainsOriginalImages.get(contCharacterVillain));
-                    contCharacterVillain++;
-                }
-            }
+        for (Character villain : villains) {
+            villain.setImage(isHeroTurn ? cardBackgroundImagesV : villainsOriginalImages.get(contCharacterVillain));
+            contCharacterVillain++;
         }
     }
 
