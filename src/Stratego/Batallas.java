@@ -31,32 +31,38 @@ public class Batallas extends javax.swing.JFrame {
         this.listaLogs = listaLogsExterna;
         this.listaUsuariosEliminados = listaUsuariosEliminadosExterna;
         this.modoTutorial = ModoJuego;
-        
+
         initComponents();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1180, 626);
         setLocationRelativeTo(null);
         setVisible(true);
-        
-        for(int i=0;i<this.listaLogs.size();i++){
-            if(listaLogs.get(i).ganadorG.equals("Villano")){
-               totalVillanos++;
-            }  
-            if(listaLogs.get(i).ganadorG.equals("Heroe")){
-               totalHeroes++;
+
+        // Verificar que la lista de logs contiene elementos
+        System.out.println("Cantidad de logs: " + listaLogs.size());
+
+        for (int i = 0; i < this.listaLogs.size(); i++) {
+            if (listaLogs.get(i).ganadorG.equals("Villano")) {
+                totalVillanos++;
+            }
+            if (listaLogs.get(i).ganadorG.equals("Heroe")) {
+                totalHeroes++;
             }
         }
-        
+
+        // Agregar impresiones para verificar la cuenta de villanos y héroes
+        System.out.println("Total Villanos: " + totalVillanos);
+        System.out.println("Total Heroes: " + totalHeroes);
+
         HeroesField.setText(Integer.toString(totalHeroes));
         VillanosField.setText(Integer.toString(totalVillanos));
-        
+
         // Mostrar usuarios activos
         mostrarUsuariosActivos();
-        
+
         // Mostrar historial de usuarios
         mostrarHistorialUsuarios();
-        
- }
+     }
     
     private void mostrarHistorialUsuarios() {
         StringBuilder historialUsuariosBuilder = new StringBuilder();

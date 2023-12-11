@@ -110,39 +110,23 @@ public class GameBoard extends JFrame {
 
         // Selección del bando
         Object[] options = { "Héroes", "Villanos" };
-        int n = JOptionPane.showOptionDialog(this, "¿Con qué bando prefieres jugar?", "Elegir bando", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-
-        // Configurar la variable isHeroTurn para el primer usuario
-        boolean isHeroTurn = (n == JOptionPane.YES_OPTION);
-
-        // Mostrar un JOptionPane indicando qué jugador es villano y cuál es héroe
-        String message;
-        String heroPlayer;
-        String villainPlayer;
-
-        if (isHeroTurn) {
-            heroPlayer = "Jugador 1";
-            villainPlayer = "Jugador 2";
-        } else {
-            heroPlayer = "Jugador 2";
-            villainPlayer = "Jugador 1";
+        int usuario1PTipoPartida = JOptionPane.showOptionDialog(this, "¿Con qué bando prefieres jugar?", "Elegir bando", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        this.usuario1PTipoPartida = usuario1PTipoPartida;
+        
+        System.out.println(usuario1PTipoPartida);
+        if (usuario1PTipoPartida != JOptionPane.YES_OPTION) {
+            isHeroTurn = false;
         }
-
-        message = String.format("%s es el Héroe y %s es el Villano.", heroPlayer, villainPlayer);
-        JOptionPane.showMessageDialog(this, message, "Información de Jugadores", JOptionPane.INFORMATION_MESSAGE);
-
+        
         // Selección del segundo usuario
         String[] nombreUsuarios2 = new String[listaUsuarios.size() - 1];
         int cont = 0;
-
         for (int i = 0; i < listaUsuarios.size(); i++) {
             if (!listaUsuarios.get(i).getUsuarioG().equals(this.usuarioGPerfil)) {
                 nombreUsuarios2[cont] = listaUsuarios.get(i).getUsuarioG();
                 cont++;
             }
         }
-
-        String usuario2;
 
         if (cont > 0) {
             usuario2 = (String) JOptionPane.showInputDialog(null, "Escoja el usuario", "", JOptionPane.QUESTION_MESSAGE, null, nombreUsuarios2, nombreUsuarios2[0]);
@@ -152,7 +136,7 @@ public class GameBoard extends JFrame {
 
             // Puedes establecer un valor por defecto para usuario2 o manejarlo de otra manera según tu lógica
             usuario2 = ""; // O establecer algún valor por defecto
-        } 
+        }
         
         contadoresVH();
         
@@ -775,19 +759,30 @@ public class GameBoard extends JFrame {
             villano = usuario2;
         }
         
+        System.out.println("Contadores: ");
+        System.out.println(usuario1PTipoPartida);
+        System.out.println(usuarioGPerfil);
+        System.out.println(usuario2);
+        
+        System.out.println("Bucle para sumar partidas de héroes: ");
         for (int i = 0; i < this.listaUsuarios.size(); i++) {
-                    if (listaUsuarios.get(i).getUsuarioG().equals(heroe)) {
-                        listaUsuarios.get(i).setPartidasHeroes(listaUsuarios.get(i).getPartidasHeroes() + 1);
-                    }
+            if (listaUsuarios.get(i).getUsuarioG().equals(villano)) {
+                System.out.println("Sumando a " + listaUsuarios.get(i).getUsuarioG());
+                listaUsuarios.get(i).setPartidasHeroes(listaUsuarios.get(i).getPartidasHeroes() + 1);
+            }
         }
 
+        System.out.println("Bucle para sumar partidas de villanos: ");
         for (int i = 0; i < this.listaUsuarios.size(); i++) {
-                    if (listaUsuarios.get(i).getUsuarioG().equals(villano)) {
-                        listaUsuarios.get(i).setPartidasVillanos(listaUsuarios.get(i).getPartidasVillanos() + 1);
-                    }
+            if (listaUsuarios.get(i).getUsuarioG().equals(heroe)) {
+                System.out.println("Sumando a " + listaUsuarios.get(i).getUsuarioG());
+                listaUsuarios.get(i).setPartidasVillanos(listaUsuarios.get(i).getPartidasVillanos() + 1);
+            }
         }
+    }
+    
+    private void contadorPartidasGanadasHV() {
         
-        System.out.println();
     }
             
     private void styleButton(JButton button, Color color, Font font) {

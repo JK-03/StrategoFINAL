@@ -40,32 +40,36 @@ public class MiPerfil extends javax.swing.JFrame {
         this.listaUsuariosEliminados = listaUsuariosEliminadosExterna;
         this.modoTutorial = ModoJuego;
 
+        // Inicializar las variables de instancia antes del bucle
+        puntos = 0;
+        partidasHeroes = 0;
+        partidasVillanos = 0;
+
         // Iterar sobre la lista de usuarios para obtener información del usuario actual
         for (int i = 0; i < listaUsuarios.size(); i++) {
             // Verificar si el usuario actual coincide con el nombre de usuario proporcionado
             if (this.listaUsuarios.get(i).getUsuarioG().equals(usuarioGPerfil)) {
                 puntos = this.listaUsuarios.get(i).getPuntos();
-            }
-
-            // Asignar partidas de héroes y villanos del usuario actual a las variables de instancia correspondientes
-            partidasHeroes = this.listaUsuarios.get(i).getPartidasHeroes();
-            partidasVillanos = this.listaUsuarios.get(i).getPartidasVillanos();
+                partidasHeroes = this.listaUsuarios.get(i).getPartidasHeroes();
+                partidasVillanos = this.listaUsuarios.get(i).getPartidasVillanos();
+                    break; // Salir del bucle después de encontrar el usuario
+                }
         }
-        
+
         initComponents();
-        
+
         //Centrar Ventana
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1180, 626);
         setLocationRelativeTo(null);
         setVisible(true);
-        
+
         //Asignar Valores Correspondientes para Salida de Pantalla
         UsernameLabel.setText(nombreUsuario);
         PartidasHeroesLabel.setText(Integer.toString(partidasHeroes));
         PartidasVillanosLabel.setText(Integer.toString(partidasVillanos));
         PuntosJugador.setText(Integer.toString(puntos));
-        
+
         //Verificar Lista
         StringBuilder historialUsuariosBuilder = new StringBuilder();
         for (UsuariosEliminadosInfo usuario : listaUsuariosEliminados) {

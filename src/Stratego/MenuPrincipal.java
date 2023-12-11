@@ -173,6 +173,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
            SwingUtilities.invokeLater(() -> {
                gameBoard = new GameBoard(this.listaUsuarios, this.listaLogs, nombreUsuario,this.listaUsuariosEliminados,this.modoTutorial);
                gameBoard.setVisible(true);
+               this.setVisible(false);
            });
        }
    }
