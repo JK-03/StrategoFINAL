@@ -103,19 +103,19 @@ public class UniversoMarvel extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void BotonRegresarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonRegresarMouseClicked
-        MenuPrincipal menuPrincipal = new MenuPrincipal(listaUsuarios,listaLogs, usuarioGPerfil,listaUsuariosEliminados,modoTutorial);
+        MenuPrincipal menuPrincipal = new MenuPrincipal(this.listaUsuarios,this.listaLogs, usuarioGPerfil,this.listaUsuariosEliminados,modoTutorial);
         menuPrincipal.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_BotonRegresarMouseClicked
 
     private void BotonRankingMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonRankingMouseClicked
-        Ranking ranking = new Ranking(listaUsuarios,listaLogs, usuarioGPerfil,listaUsuariosEliminados,modoTutorial);
+        Ranking ranking = new Ranking(this.listaUsuarios,this.listaLogs, usuarioGPerfil,this.listaUsuariosEliminados,modoTutorial);
         ranking.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_BotonRankingMouseClicked
 
     private void BotonBatallasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonBatallasMouseClicked
-        Batallas batallas = new Batallas(this.listaUsuarios,this.listaLogs, usuarioGPerfil,listaUsuariosEliminados,modoTutorial);
+        Batallas batallas = new Batallas(this.listaUsuarios,this.listaLogs, usuarioGPerfil,this.listaUsuariosEliminados,modoTutorial);
         batallas.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_BotonBatallasMouseClicked

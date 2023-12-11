@@ -21,7 +21,7 @@ public class Batallas extends javax.swing.JFrame {
     
     //Atributos de Mostrar
     String usuarioGPerfil;
-    int totalVillanos=0, totalHeroes=0;
+    int totalVillanos, totalHeroes;
     
     public Batallas(ArrayList<UsuariosInfo> listaUsuariosExterna, ArrayList<LogsInfo> listaLogsExterna, String nombreUsuario, ArrayList<UsuariosEliminadosInfo> listaUsuariosEliminadosExterna, boolean ModoJuego) {
         
@@ -38,14 +38,16 @@ public class Batallas extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
 
+        int totalVillanos=0, totalHeroes=0;
+        
         // Verificar que la lista de logs contiene elementos
-        System.out.println("Cantidad de logs: " + listaLogs.size());
+        System.out.println("Batallas cantidad de logs: " + listaLogs.size());
 
         for (int i = 0; i < this.listaLogs.size(); i++) {
-            if (listaLogs.get(i).ganadorG.equals("Villano")) {
+            if (listaLogs.get(i).ganadorG.equals("Villanos")) {
                 totalVillanos++;
             }
-            if (listaLogs.get(i).ganadorG.equals("Heroe")) {
+            if (listaLogs.get(i).ganadorG.equals("Heroes")) {
                 totalHeroes++;
             }
         }
