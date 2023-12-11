@@ -14,18 +14,22 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
+import java.awt.Font;
+import javax.swing.BorderFactory;
+import javax.swing.border.EmptyBorder;
+import java.awt.Color;
 
 public class GameBoard extends JFrame {
     ArrayList<UsuariosInfo> listaUsuarios;
     ArrayList<LogsInfo> listaLogs;
     ArrayList<UsuariosEliminadosInfo> listaUsuariosEliminados;
-    
-    //Atributos por Default de la Cuenta
-    int partidasjugadasheroes = 0, partidasjugadasvillanos = 0,usuario1PTipoPartida;
+
+    // Atributos por Default de la Cuenta
+    int partidasjugadasheroes = 0, partidasjugadasvillanos = 0, usuario1PTipoPartida;
     String tipoBandoUsuario1, tipoBandoUsuario2;
     String usuarioGPerfil, usuario2;
     private boolean modoTutorial = true;
-    
+
     // Array para almacenar personajes
     private Character[] characters;
 
@@ -34,10 +38,16 @@ public class GameBoard extends JFrame {
 
     // Botón para renunciar al juego
     private JButton resignGame = new JButton("Renunciar al Juego");
+    private String player1 = "";
+    private JLabel userHero = new JLabel();
+    private String player2 = "";
+    private JLabel userVillain = new JLabel();
+
+    private JLabel turnLabel = new JLabel();
 
     // Mostrar personajes eliminados
-    private JButton[] eliminatedHeroesButton = new JButton[40];  // Array de botones para héroes eliminados
-    private JButton[] eliminatedVillainsButton = new JButton[40];  // Array de botones para villanos eliminados
+    private JButton[] eliminatedHeroesButton = new JButton[40]; // Array de botones para héroes eliminados
+    private JButton[] eliminatedVillainsButton = new JButton[40]; // Array de botones para villanos eliminados
 
     // Ruta de las imágenes de fondo de las cartas para villanos y héroes
     private String cardBackgroundImagesV = "./src/stratego/images/VillanosClasico.png";
@@ -64,12 +74,11 @@ public class GameBoard extends JFrame {
     private boolean gameHasInit = false;
 
     // Bandera que indica si el juego ha terminado por falta de piezas
-    private boolean gameEndedOnNoPieces = false, shouldEndForVillain = false, shouldEndForHero = false;
+    private boolean gameEndedOnNoPieces = false;
 
     // Panel para héroes y villanos eliminados con disposición de cuadrícula 10x10
     JPanel eliminatedHeroesPanel = new JPanel(new GridLayout(10, 10));
     JPanel eliminatedVillainsPanel = new JPanel(new GridLayout(10, 10));
-
 
     public void close() {
         InitCharacters.getInstance().setInitCharactersNull();
@@ -99,7 +108,8 @@ public class GameBoard extends JFrame {
         }
     }
 
-    public GameBoard (ArrayList<UsuariosInfo> listaUsuariosExterna, ArrayList<LogsInfo> listaLogsExterna, String nombreUsuario, ArrayList<UsuariosEliminadosInfo> listaUsuariosEliminadosExterna, boolean ModoJuego) {
+    public GameBoard(ArrayList<UsuariosInfo> listaUsuariosExterna, ArrayList<LogsInfo> listaLogsExterna,
+            String nombreUsuario, ArrayList<UsuariosEliminadosInfo> listaUsuariosEliminadosExterna, boolean ModoJuego) {
         // Inicialización de variables de la clase
         modoTutorial = ModoJuego;
         usuarioGPerfil = nombreUsuario;
@@ -110,15 +120,12 @@ public class GameBoard extends JFrame {
 
         // Selección del bando
         Object[] options = { "Héroes", "Villanos" };
-        int usuario1PTipoPartida = JOptionPane.showOptionDialog(this, "¿Con qué bando prefieres jugar?", "Elegir bando", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        int usuario1PTipoPartida = JOptionPane.showOptionDialog(this, "¿Con qué bando prefieres jugar?", "Elegir bando",
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
         this.usuario1PTipoPartida = usuario1PTipoPartida;
-        
-        if (usuario1PTipoPartida != JOptionPane.YES_OPTION) {
-            isHeroTurn = false;
-        }
-        
-        
-        
+
+        System.out.println(usuario1PTipoPartida);
+
         // Selección del segundo usuario
         String[] nombreUsuarios2 = new String[listaUsuarios.size() - 1];
         int cont = 0;
@@ -130,17 +137,32 @@ public class GameBoard extends JFrame {
         }
 
         if (cont > 0) {
-            usuario2 = (String) JOptionPane.showInputDialog(null, "Escoja el usuario", "", JOptionPane.QUESTION_MESSAGE, null, nombreUsuarios2, nombreUsuarios2[0]);
+            usuario2 = (String) JOptionPane.showInputDialog(null, "Escoja el usuario", "", JOptionPane.QUESTION_MESSAGE,
+                    null, nombreUsuarios2, nombreUsuarios2[0]);
         } else {
             // No hay usuarios disponibles para seleccionar
-            JOptionPane.showMessageDialog(null, "No hay usuarios disponibles para seleccionar.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "No hay usuarios disponibles para seleccionar.", "Error",
+                    JOptionPane.ERROR_MESSAGE);
 
-            // Puedes establecer un valor por defecto para usuario2 o manejarlo de otra manera según tu lógica
+            // Puedes establecer un valor por defecto para usuario2 o manejarlo de otra
+            // manera según tu lógica
             usuario2 = ""; // O establecer algún valor por defecto
         }
-        
+        // System.out.println("usuario1:" + nombreUsuario + " usuario2" + usuario2);
+        if (usuario1PTipoPartida != JOptionPane.YES_OPTION) {
+            userHero.setText("Usuario jugando con piezas de Villano: " + nombreUsuario);
+            userVillain.setText("Usuario jugando con piezas de Heroe: " + usuario2);
+            player1 = nombreUsuario;
+            player2 = usuario2;
+        } else {
+            userHero.setText("Usuario jugando con piezas de Heroe: " + nombreUsuario);
+            userVillain.setText("Usuario jugando con piezas de Villano: " + usuario2);
+            player1 = usuario2;
+            player2 = nombreUsuario;
+        }
+
         contadoresVH();
-        
+
         // Configuración del JFrame
         setTitle("Stratego - Marvel Heroes");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -149,12 +171,13 @@ public class GameBoard extends JFrame {
         // Panel para el tablero de juego
         JPanel gameBoardPanel = new JPanel(new GridLayout(10, 10));
         gameBoardPanel.setPreferredSize(new Dimension(1200, 800));
-        // gameBoardPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Agrega espacio alrededor del tablero de juego
+        // gameBoardPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); //
+        // Agrega espacio alrededor del tablero de juego
 
         // Inicialización de los botones del tablero de juego
         characters = InitCharacters.getInstance().getCharacters();
         loadOriginalButtonImages();
-        
+
         // confirmEndTurnHideCards.addActionListener(e -> toggleCardVisibility());
         for (int row = 0; row < 10; row++) {
             for (int col = 0; col < 10; col++) {
@@ -170,10 +193,33 @@ public class GameBoard extends JFrame {
         // Agrega un ActionListener al botón resignGame
         styleButton(resignGame, Color.RED, new Font("Arial", Font.BOLD, 14));
         add(resignGame, BorderLayout.NORTH);
-        if (modoTutorial) {
 
+        JPanel southPanel = new JPanel();
+        southPanel.setBorder(new EmptyBorder(1, 1, 1, 1)); // Agrega espaciado
+
+        Font Arial = new Font("Arial", Font.PLAIN, 15); // Crea la fuente
+
+        if (isHeroTurn) {
+            turnLabel.setText("Turno de (Heroes): " + usuarioGPerfil);
+        } else {
+            turnLabel.setText("Turno de (Villanos): " + usuarioGPerfil);
         }
-        
+
+        turnLabel.setFont(Arial); // Cambia el estilo de letra de turnLabel
+        userHero.setFont(Arial); // Cambia el estilo de letra de userHero
+        userVillain.setFont(Arial); // Cambia el estilo de letra de userVillain
+
+        userHero.setBorder(new EmptyBorder(10, 10, 10, 10)); // Agrega relleno
+        userVillain.setBorder(new EmptyBorder(10, 10, 10, 10)); // Agrega relleno
+
+        userHero.setForeground(Color.BLUE); // Cambia el color del texto de userHero a azul
+        userVillain.setForeground(Color.RED); // Cambia el color del texto de userVillain a rojo
+
+        southPanel.add(userHero);
+        southPanel.add(userVillain);
+        southPanel.add(turnLabel);
+        add(southPanel, BorderLayout.SOUTH);
+
         // Actualiza los paneles
         updatePanels();
 
@@ -184,12 +230,11 @@ public class GameBoard extends JFrame {
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
-        mostrarTurno(isHeroTurn ? usuarioGPerfil : usuario2, !isHeroTurn);
-        
+
         // ActionListener para el botón resignGame
         resignGame.addActionListener(e -> endGame());
     }
-    
+
     public void updatePanels() {
         eliminatedHeroesPanel.removeAll(); // Remove all existing components from the panel
         eliminatedHeroesPanel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 10));
@@ -221,13 +266,11 @@ public class GameBoard extends JFrame {
         for (Character hero : heroes) {
             if (!excludeNames.contains(hero.getName()) && hero.isAlive() && hero.getMoveable()) {
                 shouldEndForVillain = true;
-                this.shouldEndForVillain = shouldEndForVillain;
             }
         }
         for (Character villain : villains) {
             if (!excludeNames.contains(villain.getName()) && villain.isAlive() && villain.getMoveable()) {
                 shouldEndForHero = true;
-                this.shouldEndForHero = shouldEndForHero;
             }
         }
 
@@ -240,79 +283,83 @@ public class GameBoard extends JFrame {
     }
 
     private JButton createGameSpace(int row, int col) {
-    JButton button = new JButton() {
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            // Itera sobre los personajes para encontrar el que ocupa esta posición en el tablero
-            for (Character character : characters) {
-                if (character.isAlive() && character.getX() == row && character.getY() == col) {
-                    ImageIcon image = character.getImage();
-                    if (image != null) {
-                        // Calcula la posición para centrar la imagen
-                        int x = (getWidth() - image.getIconWidth()) / 2;
-                        int y = (getHeight() - image.getIconHeight()) / 2;
-                        // Dibuja la imagen en la posición calculada
-                        g.drawImage(image.getImage(), x, y, null);
+        JButton button = new JButton() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                // Itera sobre los personajes para encontrar el que ocupa esta posición en el
+                // tablero
+                for (Character character : characters) {
+                    if (character.isAlive() && character.getX() == row && character.getY() == col) {
+                        ImageIcon image = character.getImage();
+                        if (image != null) {
+                            // Calcula la posición para centrar la imagen
+                            int x = (getWidth() - image.getIconWidth()) / 2;
+                            int y = (getHeight() - image.getIconHeight()) / 2;
+                            // Dibuja la imagen en la posición calculada
+                            g.drawImage(image.getImage(), x, y, null);
 
-                        // Establece el borde azul si es un héroe, rojo si no lo es
-                        if (character.isHero()) {
-                            setBorder(BorderFactory.createLineBorder(Color.BLUE, 1));
-                        } else {
-                            setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-                        }
+                            // Establece el borde azul si es un héroe, rojo si no lo es
+                            if (character.isHero()) {
+                                setBorder(BorderFactory.createLineBorder(Color.BLUE, 1));
+                            } else {
+                                setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+                            }
 
-                        // Si el personaje está seleccionado, establece el borde verde
-                        if (character == selectedCharacter) {
-                            setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
+                            // Si el personaje está seleccionado, establece el borde verde
+                            if (character == selectedCharacter) {
+                                setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
+                            }
                         }
                     }
                 }
             }
-        }
 
-        @Override
-        public Dimension getPreferredSize() {
-            return new Dimension(50, 50);
-        }
-
-        @Override
-        public Dimension getMinimumSize() {
-            return new Dimension(50, 50);
-        }
-
-        @Override
-        public Dimension getMaximumSize() {
-            return new Dimension(50, 50);
-        }
-    };
-
-    // Verifica si la posición está en una zona prohibida (amarilla o magenta)
-    boolean isYellowZone = (row >= 4 && row <= 5 && col >= 2 && col <= 3);
-    boolean isMagentaZone = (row >= 4 && row <= 5 && col >= 6 && col <= 7);
-
-    if (isYellowZone || isMagentaZone) {
-        // Establece el color de fondo para las zonas prohibidas (amarillo o magenta)
-        button.setBackground(Color.RED);
-        // Agrega un ActionListener para mostrar un mensaje de advertencia al hacer clic en una zona prohibida
-        button.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null, "¡Zona prohibida!", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            public Dimension getPreferredSize() {
+                return new Dimension(50, 50);
             }
-        });
-    } else {
-        // Si no está en una zona prohibida, agrega un ActionListener para manejar el clic en los botones del tablero
-        button.addActionListener(e -> handleButtonClick(row, col));
-    }
 
-    return button;
-}
+            @Override
+            public Dimension getMinimumSize() {
+                return new Dimension(50, 50);
+            }
+
+            @Override
+            public Dimension getMaximumSize() {
+                return new Dimension(50, 50);
+            }
+        };
+
+        // Verifica si la posición está en una zona prohibida (amarilla o magenta)
+        boolean isYellowZone = (row >= 4 && row <= 5 && col >= 2 && col <= 3);
+        boolean isMagentaZone = (row >= 4 && row <= 5 && col >= 6 && col <= 7);
+
+        if (isYellowZone || isMagentaZone) {
+            // Establece el color de fondo para las zonas prohibidas (amarillo o magenta)
+            button.setBackground(Color.RED);
+            // Agrega un ActionListener para mostrar un mensaje de advertencia al hacer clic
+            // en una zona prohibida
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JOptionPane.showMessageDialog(null, "¡Zona prohibida!", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                }
+            });
+        } else {
+            // Si no está en una zona prohibida, agrega un ActionListener para manejar el
+            // clic en los botones del tablero
+            button.addActionListener(e -> handleButtonClick(row, col));
+        }
+
+        return button;
+    }
 
     private Character selectedCharacter = null;
 
     private void handleButtonClick(int row, int col) {
-        // Muestra información en la consola sobre la fila y columna del botón seleccionado
+        // Muestra información en la consola sobre la fila y columna del botón
+        // seleccionado
         System.out.println("Clic en la fila " + row + ", columna " + col);
 
         // Indica que el juego ha comenzado
@@ -327,9 +374,17 @@ public class GameBoard extends JFrame {
             handleCharacterSelection(row, col);
         }
     }
-    
+
     private boolean heroesGanaron = false;
     private boolean villanosGanaron = false;
+
+    public void updateTurnLabel() {
+        if (isHeroTurn) {
+            turnLabel.setText("Turno de (Heroes): " + player2);
+        } else {
+            turnLabel.setText("Turno de (Villanos): " + player1);
+        }
+    }
 
     private void handleCharacterMove(int row, int col) {
         String villano = "", heroe = "";
@@ -340,7 +395,7 @@ public class GameBoard extends JFrame {
             heroe = usuarioGPerfil;
             villano = usuario2;
         }
-        
+
         if (selectedCharacter.getX() == row && selectedCharacter.getY() == col) {
             handleCharacterDeselection(row, col);
         } else {
@@ -350,15 +405,16 @@ public class GameBoard extends JFrame {
             boolean canMove = isAdjacent;
 
             if (selectedCharacter.getPowerRating() == 2 && !isAdjacent) {
-                canMove = (selectedCharacter.getX() == row || selectedCharacter.getY() == col) && isPathClear(selectedCharacter.getX(), selectedCharacter.getY(), row, col);
+                canMove = (selectedCharacter.getX() == row || selectedCharacter.getY() == col)
+                        && isPathClear(selectedCharacter.getX(), selectedCharacter.getY(), row, col);
             }
 
             if (isEmpty && canMove) {
                 Character targetCharacter = getCharacterAtLocation(row, col);
                 moveCharacter(row, col);
                 isHeroTurn = !isHeroTurn;
-                mostrarTurno(isHeroTurn ? usuarioGPerfil : usuario2, !isHeroTurn);
-                
+                updateTurnLabel();
+
             } else if (isAdjacent || selectedCharacter.getPowerRating() == 2) {
                 Character targetCharacter = getCharacterAtLocation(row, col);
 
@@ -368,7 +424,8 @@ public class GameBoard extends JFrame {
                         ImageIcon selectedImage = selectedCharacter.getImage();
                         ImageIcon targetImage = targetCharacter.getImage();
                         Object[] message = {
-                            "¿Estás seguro de que quieres luchar?", "Personaje seleccionado:", new JLabel(selectedImage), "Personaje objetivo:", new JLabel(targetImage)};
+                                "¿Estás seguro de que quieres luchar?", "Personaje seleccionado:",
+                                new JLabel(selectedImage), "Personaje objetivo:", new JLabel(targetImage) };
                         int n = JOptionPane.showOptionDialog(this,
                                 message,
                                 "Confirmar lucha",
@@ -383,42 +440,53 @@ public class GameBoard extends JFrame {
                             if (targetCharacter.getName().equals("Tierra")) {
                                 DateTimeFormatter fechapartida = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
                                 LocalDateTime fecha = LocalDateTime.now();
-                                String mensaje = String.format("%s VENCEDOR usando VILLANOS ha CAPTURADO la tierra! Venciendo a %s PERDEDOR - %s",
+                                String mensaje = String.format(
+                                        "%s VENCEDOR usando VILLANOS ha CAPTURADO la tierra! Venciendo a %s PERDEDOR - %s",
                                         heroe, villano, fechapartida.format(fecha));
                                 JOptionPane.showMessageDialog(this, mensaje);
                                 this.listaLogs.add(new LogsInfo(mensaje, "Villanos"));
+                                System.out.println("Tamaño de listaLogs después de agregar: " + listaLogs.size());
                                 puntosUsuarios();
 
-                                MenuPrincipal menuPrincipal = new MenuPrincipal(this.listaUsuarios, this.listaLogs, usuarioGPerfil,this.listaUsuariosEliminados, modoTutorial);
+                                MenuPrincipal menuPrincipal = new MenuPrincipal(this.listaUsuarios, this.listaLogs,
+                                        usuarioGPerfil, this.listaUsuariosEliminados, modoTutorial);
                                 menuPrincipal.setVisible(true);
                                 this.setVisible(false);
-                                
+
                                 villanosGanaron = true;
-                                //MenuPrincipal menuPrincipal = new MenuPrincipal(listaUsuarios, listaLogs, usuarioGPerfil,listaUsuariosEliminados, modoTutorial);
-                                //close();
+                                // MenuPrincipal menuPrincipal = new MenuPrincipal(listaUsuarios, listaLogs,
+                                // usuarioGPerfil,listaUsuariosEliminados, modoTutorial);
+                                // close();
                             } else if (targetCharacter.getName().equals("Planet Tierra")) {
                                 DateTimeFormatter fechapartida = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
                                 LocalDateTime fecha = LocalDateTime.now();
-                                String mensaje = String.format("%s VENCEDOR usando HEROES ha SALVADO la tierra! Venciendo a %s PERDEDOR - %s",
+                                String mensaje = String.format(
+                                        "%s VENCEDOR usando HEROES ha SALVADO la tierra! Venciendo a %s PERDEDOR - %s",
                                         villano, heroe, fechapartida.format(fecha));
                                 JOptionPane.showMessageDialog(this, mensaje);
                                 this.listaLogs.add(new LogsInfo(mensaje, "Heroes"));
                                 puntosUsuarios();
-                                MenuPrincipal menuPrincipal = new MenuPrincipal(this.listaUsuarios, this.listaLogs, usuarioGPerfil,this.listaUsuariosEliminados, modoTutorial);
+                                MenuPrincipal menuPrincipal = new MenuPrincipal(this.listaUsuarios, this.listaLogs,
+                                        usuarioGPerfil, this.listaUsuariosEliminados, modoTutorial);
                                 menuPrincipal.setVisible(true);
                                 this.setVisible(false);
                                 partidasjugadasheroes++;
-                                
+
                                 heroesGanaron = true;
-                            } else if ((selectedCharacter.getPowerRating() != 3 && (targetCharacter.getName().equals("Nova Blast") || targetCharacter.getName().equals("Pumpkin Bomb")))) {
-                                if ((!targetCharacter.isHero() && isHeroTurn) || (targetCharacter.isHero() && !isHeroTurn)) {
+                            } else if ((selectedCharacter.getPowerRating() != 3
+                                    && (targetCharacter.getName().equals("Nova Blast")
+                                            || targetCharacter.getName().equals("Pumpkin Bomb")))) {
+                                if ((!targetCharacter.isHero() && isHeroTurn)
+                                        || (targetCharacter.isHero() && !isHeroTurn)) {
                                     // Si tienen el mismo powerRating, se eliminan solas
                                     List<Character> charactersToEliminate = new ArrayList<>();
                                     charactersToEliminate.add(targetCharacter);
-                                    buttons[targetCharacter.getX()][targetCharacter.getY()].setBorder(BorderFactory.createLineBorder(Color.black, 1));
+                                    buttons[targetCharacter.getX()][targetCharacter.getY()]
+                                            .setBorder(BorderFactory.createLineBorder(Color.black, 1));
                                     charactersToEliminate.add(selectedCharacter);
-                                    buttons[selectedCharacter.getX()][selectedCharacter.getY()].setBorder(BorderFactory.createLineBorder(Color.black, 1));
-                                    
+                                    buttons[selectedCharacter.getX()][selectedCharacter.getY()]
+                                            .setBorder(BorderFactory.createLineBorder(Color.black, 1));
+
                                     for (Character character : charactersToEliminate) {
                                         eliminateCharacter(character, false, true);
                                     }
@@ -431,14 +499,15 @@ public class GameBoard extends JFrame {
                                     revalidate();
                                     repaint();
                                     isHeroTurn = !isHeroTurn;
-                                    mostrarTurno(isHeroTurn ? usuarioGPerfil : usuario2, !isHeroTurn);
+                                    updateTurnLabel();
                                     // updateEliminatedCharactersWindows();
 
                                 }
                             } else if (selectedCharacter.getPowerRating() == 2) {
                                 // Check if the move is in a straight line horizontally or vertically
                                 if (selectedCharacter.getX() == row || selectedCharacter.getY() == col) {
-                                    // Check if there is any character between the current position and the target position
+                                    // Check if there is any character between the current position and the target
+                                    // position
                                     int xDirection = Integer.compare(row, selectedCharacter.getX());
                                     int yDirection = Integer.compare(col, selectedCharacter.getY());
 
@@ -449,6 +518,7 @@ public class GameBoard extends JFrame {
                                         Character intermediateCharacter = getCharacterAtLocation(x, y);
                                         if (intermediateCharacter != null) {
                                             // There is a character in the way, so the move is not allowed
+                                            System.out.println("Movimiento incorrecto");
                                             return;
                                         }
 
@@ -460,16 +530,20 @@ public class GameBoard extends JFrame {
                                     targetCharacter = getCharacterAtLocation(row, col);
                                     if (targetCharacter != null) {
                                         if (selectedCharacter.isHero() == targetCharacter.isHero()) {
-                                            // The target position is occupied by a character of the same type, so the move is not allowed
+                                            // The target position is occupied by a character of the same type, so the
+                                            // move is not allowed
+                                            System.out.println("Movimiento incorrecto");
                                             return;
                                         } else if (selectedCharacter.getPowerRating() == targetCharacter
                                                 .getPowerRating()) {
                                             // If they have the same powerRating, they eliminate each other
                                             List<Character> charactersToEliminate = new ArrayList<>();
                                             charactersToEliminate.add(targetCharacter);
-                                            buttons[targetCharacter.getX()][targetCharacter.getY()].setBorder(BorderFactory.createLineBorder(Color.black, 1));
+                                            buttons[targetCharacter.getX()][targetCharacter.getY()]
+                                                    .setBorder(BorderFactory.createLineBorder(Color.black, 1));
                                             charactersToEliminate.add(selectedCharacter);
-                                            buttons[selectedCharacter.getX()][selectedCharacter.getY()].setBorder(BorderFactory.createLineBorder(Color.black, 1));
+                                            buttons[selectedCharacter.getX()][selectedCharacter.getY()]
+                                                    .setBorder(BorderFactory.createLineBorder(Color.black, 1));
                                             for (Character character : charactersToEliminate) {
                                                 eliminateCharacter(character, false, true);
                                             }
@@ -482,26 +556,26 @@ public class GameBoard extends JFrame {
                                             revalidate();
                                             repaint();
                                             isHeroTurn = !isHeroTurn;
-                                            mostrarTurno(isHeroTurn ? usuarioGPerfil : usuario2, !isHeroTurn);
+                                            updateTurnLabel();
                                         } else if (selectedCharacter.getPowerRating() > targetCharacter
                                                 .getPowerRating()) {
                                             // The selected character can eliminate the target character
                                             eliminateCharacter(targetCharacter, false, false);
                                             moveCharacter(row, col);
                                             isHeroTurn = !isHeroTurn;
-                                            mostrarTurno(isHeroTurn ? usuarioGPerfil : usuario2, !isHeroTurn);
+                                            updateTurnLabel();
                                         } else {
                                             // The selected character has a lower power rating, so it is eliminated
                                             eliminateCharacter(selectedCharacter, true, false);
                                             selectedCharacter = null; // Allow another piece to be selected
                                             revalidate();
-                                             if (!modoTutorial) {
+                                            if (!modoTutorial) {
                                                 changeCardBackgrounds();
 
                                             }
                                             repaint();
                                             isHeroTurn = !isHeroTurn;
-                                            mostrarTurno(isHeroTurn ? usuarioGPerfil : usuario2, !isHeroTurn);
+                                            updateTurnLabel();
                                         }
                                     }
                                 } else {
@@ -510,14 +584,18 @@ public class GameBoard extends JFrame {
                                     return;
                                 }
                             } else if (selectedCharacter.getPowerRating() > targetCharacter.getPowerRating() ||
-                                    (selectedCharacter.getPowerRating() == 3 && (targetCharacter.getName().equals("Nova Blast") || targetCharacter.getName().equals("Pumpkin Bomb")))
+                                    (selectedCharacter.getPowerRating() == 3
+                                            && (targetCharacter.getName().equals("Nova Blast")
+                                                    || targetCharacter.getName().equals("Pumpkin Bomb")))
                                     ||
-                                    (selectedCharacter.getPowerRating() == 1 && targetCharacter.getPowerRating() == 10)) {
-                                if ((!targetCharacter.isHero() && isHeroTurn) || (targetCharacter.isHero() && !isHeroTurn)) {
+                                    (selectedCharacter.getPowerRating() == 1
+                                            && targetCharacter.getPowerRating() == 10)) {
+                                if ((!targetCharacter.isHero() && isHeroTurn)
+                                        || (targetCharacter.isHero() && !isHeroTurn)) {
                                     eliminateCharacter(targetCharacter, false, false);
                                     moveCharacter(row, col);
                                     isHeroTurn = !isHeroTurn;
-                                    mostrarTurno(isHeroTurn ? usuarioGPerfil : usuario2, !isHeroTurn);
+                                    updateTurnLabel();
                                 }
                             } else if (selectedCharacter.getPowerRating() < targetCharacter.getPowerRating()) {
                                 // Si una pieza menor ataca a una mayor, se elimina sola
@@ -530,20 +608,22 @@ public class GameBoard extends JFrame {
                                 revalidate();
                                 repaint();
                                 isHeroTurn = !isHeroTurn;
-                                mostrarTurno(isHeroTurn ? usuarioGPerfil : usuario2, !isHeroTurn);
+                                updateTurnLabel();
                             } else if (selectedCharacter.getPowerRating() == targetCharacter.getPowerRating()) {
                                 // Si tienen el mismo powerRating, se eliminan solas
                                 JOptionPane.showMessageDialog(null, "¡Empate! Ambas cartas eran el mismo rango.");
-                                
+
                                 List<Character> charactersToEliminate = new ArrayList<>();
                                 charactersToEliminate.add(targetCharacter);
-                                buttons[targetCharacter.getX()][targetCharacter.getY()].setBorder(BorderFactory.createLineBorder(Color.black, 1));
+                                buttons[targetCharacter.getX()][targetCharacter.getY()]
+                                        .setBorder(BorderFactory.createLineBorder(Color.black, 1));
                                 charactersToEliminate.add(selectedCharacter);
-                                buttons[selectedCharacter.getX()][selectedCharacter.getY()].setBorder(BorderFactory.createLineBorder(Color.black, 1));
+                                buttons[selectedCharacter.getX()][selectedCharacter.getY()]
+                                        .setBorder(BorderFactory.createLineBorder(Color.black, 1));
                                 for (Character character : charactersToEliminate) {
                                     eliminateCharacter(character, false, true);
                                 }
-                                
+
                                 selectedCharacter = null; // Permitir la selección de otra pieza
                                 if (!modoTutorial) {
                                     changeCardBackgrounds();
@@ -552,7 +632,7 @@ public class GameBoard extends JFrame {
                                 revalidate();
                                 repaint();
                                 isHeroTurn = !isHeroTurn;
-                                mostrarTurno(isHeroTurn ? usuarioGPerfil : usuario2, !isHeroTurn);
+                                updateTurnLabel();
 
                             } else if (selectedCharacter.getPowerRating() == 1) {
                                 // saveTheEarth();
@@ -636,10 +716,9 @@ public class GameBoard extends JFrame {
 
                 puntosUsuarios();
                 mostrarMenuPrincipal();
+                close();
             }
         }
-
-        close();
     }
 
     private boolean isTurnoVillano() {
@@ -741,20 +820,20 @@ public class GameBoard extends JFrame {
             heroe = usuarioGPerfil;
             villano = usuario2;
         }
-        
+
         for (int i = 0; i < this.listaUsuarios.size(); i++) {
-                    if (listaUsuarios.get(i).getUsuarioG().equals(heroe)) {
-                        listaUsuarios.get(i).setPuntos(listaUsuarios.get(i).getPuntos() + 3);
-                    }
+            if (listaUsuarios.get(i).getUsuarioG().equals(heroe)) {
+                listaUsuarios.get(i).setPuntos(listaUsuarios.get(i).getPuntos() + 3);
+            }
         }
 
         for (int i = 0; i < this.listaUsuarios.size(); i++) {
-                    if (listaUsuarios.get(i).getUsuarioG().equals(villano)) {
-                        listaUsuarios.get(i).setPuntos(listaUsuarios.get(i).getPuntos() + 3);
-                    }
+            if (listaUsuarios.get(i).getUsuarioG().equals(villano)) {
+                listaUsuarios.get(i).setPuntos(listaUsuarios.get(i).getPuntos() + 3);
+            }
         }
     }
-    
+
     private Character getCharacterAtLocation(int row, int col) {
         for (Character character : characters) {
             if (character.getX() == row && character.getY() == col) {
@@ -790,7 +869,7 @@ public class GameBoard extends JFrame {
         }
 
     }
-    
+
     private void contadoresVH() {
         String villano = "", heroe = "";
         if (usuario1PTipoPartida == 0) {
@@ -800,24 +879,33 @@ public class GameBoard extends JFrame {
             heroe = usuarioGPerfil;
             villano = usuario2;
         }
-        
+
+        System.out.println("Contadores: ");
+        System.out.println(usuario1PTipoPartida);
+        System.out.println(usuarioGPerfil);
+        System.out.println(usuario2);
+
+        System.out.println("Bucle para sumar partidas de héroes: ");
         for (int i = 0; i < this.listaUsuarios.size(); i++) {
             if (listaUsuarios.get(i).getUsuarioG().equals(villano)) {
+                System.out.println("Sumando a " + listaUsuarios.get(i).getUsuarioG());
                 listaUsuarios.get(i).setPartidasHeroes(listaUsuarios.get(i).getPartidasHeroes() + 1);
             }
         }
 
+        System.out.println("Bucle para sumar partidas de villanos: ");
         for (int i = 0; i < this.listaUsuarios.size(); i++) {
             if (listaUsuarios.get(i).getUsuarioG().equals(heroe)) {
+                System.out.println("Sumando a " + listaUsuarios.get(i).getUsuarioG());
                 listaUsuarios.get(i).setPartidasVillanos(listaUsuarios.get(i).getPartidasVillanos() + 1);
             }
         }
-        
-        if (!modoTutorial) {
-            changeCardBackgrounds();
-        }
     }
-            
+
+    private void contadorPartidasGanadasHV() {
+
+    }
+
     private void styleButton(JButton button, Color color, Font font) {
         button.setBackground(color);
         button.setForeground(Color.WHITE);
@@ -826,17 +914,10 @@ public class GameBoard extends JFrame {
         button.setBorder(BorderFactory.createRaisedBevelBorder());
     }
 
-    public static void mostrarTurno(String usuario, boolean isTurnoVillano) {
-        String turnoMensaje = isTurnoVillano ? "Turno de Villano" : "Turno de Héroe";
-        String mensaje = String.format("%s\nJugador: %s", turnoMensaje, usuario);
-
-        JOptionPane.showMessageDialog(null, mensaje, "Turno", JOptionPane.INFORMATION_MESSAGE);
-    }
-    
     private void changeCardBackgrounds() {
         int contCharacterVillain = 0;
         int contCharacterHero = 0;
-        
+
         if (isHeroTurn) {
             for (Character character : heroes) {
                 character.setImage(cardBackgroundImagesH);

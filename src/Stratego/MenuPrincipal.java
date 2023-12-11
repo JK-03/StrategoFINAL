@@ -34,16 +34,6 @@ public class MenuPrincipal extends javax.swing.JFrame {
         setSize(1180, 626);
         setLocationRelativeTo(null);
         setVisible(true);
-        
-        //Verificar Lista
-        /*
-        StringBuilder historialUsuariosBuilder = new StringBuilder();
-        for (UsuariosEliminadosInfo usuario : listaUsuariosEliminados) {
-            historialUsuariosBuilder.append(usuario.getUsuariosEliminado());  // Corregir el método para obtener el usuario eliminado
-            historialUsuariosBuilder.append("\n");
-        }
-        System.out.println(historialUsuariosBuilder.toString());
-        */
     }
 
     /**
