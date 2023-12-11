@@ -154,18 +154,23 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private GameBoard gameBoard;
     
     private void BotonStrategoMouseClicked(java.awt.event.MouseEvent evt) {
-       if (listaUsuarios.size() < 2) {
-           JOptionPane.showMessageDialog(null, "Se requieren al menos dos usuarios para iniciar el juego. Por favor, cree más usuarios antes de comenzar.", "Error", JOptionPane.WARNING_MESSAGE);
-       } else {
-           if (gameBoard != null) {
-               gameBoard.close(); // Close the current game board
-           }
-           SwingUtilities.invokeLater(() -> {
-               gameBoard = new GameBoard(this.listaUsuarios, this.listaLogs, nombreUsuario,this.listaUsuariosEliminados,this.modoTutorial);
-               gameBoard.setVisible(true);
-               this.setVisible(false);
-           });
-       }
+        if (listaUsuarios.size() < 2) {
+            JOptionPane.showMessageDialog(null, "Se requieren al menos dos usuarios para iniciar el juego. Por favor, cree más usuarios antes de comenzar.", "Error", JOptionPane.WARNING_MESSAGE);
+        } else {
+         int confirmationResult = JOptionPane.showConfirmDialog(null, "¿Realmente deseas comenzar una nueva partida?", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+        if (confirmationResult == JOptionPane.YES_OPTION) {
+             if (gameBoard != null) {
+                 gameBoard.close(); // Cerrar el tablero de juego actual si existe
+             }
+             SwingUtilities.invokeLater(() -> {
+                 gameBoard = new GameBoard(this.listaUsuarios, this.listaLogs, nombreUsuario, this.listaUsuariosEliminados, this.modoTutorial);
+                 gameBoard.setVisible(true);
+                 this.setVisible(false);
+             });
+         }
+         // Si el usuario elige "No" en la confirmación, no se realiza ninguna acción.
+     }
    }
 
     

@@ -124,8 +124,6 @@ public class GameBoard extends JFrame {
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
         this.usuario1PTipoPartida = usuario1PTipoPartida;
 
-        System.out.println(usuario1PTipoPartida);
-
         // Selección del segundo usuario
         String[] nombreUsuarios2 = new String[listaUsuarios.size() - 1];
         int cont = 0;
@@ -177,6 +175,10 @@ public class GameBoard extends JFrame {
         // Inicialización de los botones del tablero de juego
         characters = InitCharacters.getInstance().getCharacters();
         loadOriginalButtonImages();
+        
+        if (!modoTutorial) {
+          changeCardBackgrounds();
+        }
 
         // confirmEndTurnHideCards.addActionListener(e -> toggleCardVisibility());
         for (int row = 0; row < 10; row++) {
@@ -219,7 +221,7 @@ public class GameBoard extends JFrame {
         southPanel.add(userVillain);
         southPanel.add(turnLabel);
         add(southPanel, BorderLayout.SOUTH);
-
+        
         // Actualiza los paneles
         updatePanels();
 
@@ -330,7 +332,7 @@ public class GameBoard extends JFrame {
                 return new Dimension(50, 50);
             }
         };
-
+        
         // Verifica si la posición está en una zona prohibida (amarilla o magenta)
         boolean isYellowZone = (row >= 4 && row <= 5 && col >= 2 && col <= 3);
         boolean isMagentaZone = (row >= 4 && row <= 5 && col >= 6 && col <= 7);
@@ -414,6 +416,9 @@ public class GameBoard extends JFrame {
                 moveCharacter(row, col);
                 isHeroTurn = !isHeroTurn;
                 updateTurnLabel();
+                if (!modoTutorial) {
+                   changeCardBackgrounds();
+                }
 
             } else if (isAdjacent || selectedCharacter.getPowerRating() == 2) {
                 Character targetCharacter = getCharacterAtLocation(row, col);
@@ -448,8 +453,7 @@ public class GameBoard extends JFrame {
                                 System.out.println("Tamaño de listaLogs después de agregar: " + listaLogs.size());
                                 puntosUsuarios();
 
-                                MenuPrincipal menuPrincipal = new MenuPrincipal(this.listaUsuarios, this.listaLogs,
-                                        usuarioGPerfil, this.listaUsuariosEliminados, modoTutorial);
+                                MenuPrincipal menuPrincipal = new MenuPrincipal(this.listaUsuarios, this.listaLogs,usuarioGPerfil, this.listaUsuariosEliminados, modoTutorial);
                                 menuPrincipal.setVisible(true);
                                 this.setVisible(false);
 
@@ -880,12 +884,6 @@ public class GameBoard extends JFrame {
             villano = usuario2;
         }
 
-        System.out.println("Contadores: ");
-        System.out.println(usuario1PTipoPartida);
-        System.out.println(usuarioGPerfil);
-        System.out.println(usuario2);
-
-        System.out.println("Bucle para sumar partidas de héroes: ");
         for (int i = 0; i < this.listaUsuarios.size(); i++) {
             if (listaUsuarios.get(i).getUsuarioG().equals(villano)) {
                 System.out.println("Sumando a " + listaUsuarios.get(i).getUsuarioG());
@@ -893,17 +891,12 @@ public class GameBoard extends JFrame {
             }
         }
 
-        System.out.println("Bucle para sumar partidas de villanos: ");
         for (int i = 0; i < this.listaUsuarios.size(); i++) {
             if (listaUsuarios.get(i).getUsuarioG().equals(heroe)) {
                 System.out.println("Sumando a " + listaUsuarios.get(i).getUsuarioG());
                 listaUsuarios.get(i).setPartidasVillanos(listaUsuarios.get(i).getPartidasVillanos() + 1);
             }
         }
-    }
-
-    private void contadorPartidasGanadasHV() {
-
     }
 
     private void styleButton(JButton button, Color color, Font font) {
@@ -918,25 +911,55 @@ public class GameBoard extends JFrame {
         int contCharacterVillain = 0;
         int contCharacterHero = 0;
 
-        if (isHeroTurn) {
-            for (Character character : heroes) {
-                character.setImage(cardBackgroundImagesH);
-            }
-            // reset to default values
-            for (Character character : villains) {
-                character.setImage(villainsOriginalImages.get(contCharacterVillain));
-                contCharacterVillain++;
-            }
+        if (usuario1PTipoPartida == 0) {
+            // Juegan con héroes
+            if (isHeroTurn) {
+                // Es el turno de los héroes, ocultar las cartas de villanos
+                for (Character villain : villains) {
+                    villain.setImage(cardBackgroundImagesV);
+                }
 
-        }
-        if (!isHeroTurn) {
-            for (Character character : villains) {
-                character.setImage(cardBackgroundImagesV);
+                // Mostrar las cartas de héroes
+                for (Character hero : heroes) {
+                    hero.setImage(heroesOriginalImages.get(contCharacterHero));
+                    contCharacterHero++;
+                }
+            } else {
+                // Es el turno de los villanos, ocultar las cartas de héroes
+                for (Character hero : heroes) {
+                    hero.setImage(cardBackgroundImagesH);
+                }
+
+                // Mostrar las cartas de villanos
+                for (Character villain : villains) {
+                    villain.setImage(villainsOriginalImages.get(contCharacterVillain));
+                    contCharacterVillain++;
+                }
             }
-            // reset to default values
-            for (Character character : heroes) {
-                character.setImage(heroesOriginalImages.get(contCharacterHero));
-                contCharacterHero++;
+        } else {
+            // Juegan con villanos
+            if (isHeroTurn) {
+                // Es el turno de los héroes, ocultar las cartas de villanos
+                for (Character villain : villains) {
+                    villain.setImage(cardBackgroundImagesV);
+                }
+
+                // Mostrar las cartas de héroes
+                for (Character hero : heroes) {
+                    hero.setImage(heroesOriginalImages.get(contCharacterHero));
+                    contCharacterHero++;
+                }
+            } else {
+                // Es el turno de los villanos, ocultar las cartas de héroes
+                for (Character hero : heroes) {
+                    hero.setImage(cardBackgroundImagesH);
+                }
+
+                // Mostrar las cartas de villanos
+                for (Character villain : villains) {
+                    villain.setImage(villainsOriginalImages.get(contCharacterVillain));
+                    contCharacterVillain++;
+                }
             }
         }
     }
