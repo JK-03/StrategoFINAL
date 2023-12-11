@@ -74,6 +74,8 @@ public class GameBoard extends JFrame {
 
     // Bandera que indica si el juego ha terminado por falta de piezas
     private boolean gameEndedOnNoPieces = false;
+    
+    private JLabel nameLabel, rankLabel, imageLabel;
 
     // Panel para héroes y villanos eliminados con disposición de cuadrícula 10x10
     JPanel eliminatedHeroesPanel = new JPanel(new GridLayout(10, 10));
@@ -107,8 +109,10 @@ public class GameBoard extends JFrame {
         }
     }
 
-    public GameBoard(ArrayList<UsuariosInfo> listaUsuariosExterna, ArrayList<LogsInfo> listaLogsExterna,
-            String nombreUsuario, ArrayList<UsuariosEliminadosInfo> listaUsuariosEliminadosExterna, boolean ModoJuego) {
+    public GameBoard(ArrayList<UsuariosInfo> listaUsuariosExterna, ArrayList<LogsInfo> listaLogsExterna, String nombreUsuario, ArrayList<UsuariosEliminadosInfo> listaUsuariosEliminadosExterna, boolean ModoJuego) {
+        heroesOriginalImages = new ArrayList<>();
+        villainsOriginalImages = new ArrayList<>();
+
         // Inicialización de variables de la clase
         modoTutorial = ModoJuego;
         usuarioGPerfil = nombreUsuario;
@@ -145,19 +149,11 @@ public class GameBoard extends JFrame {
             // manera según tu lógica
             usuario2 = ""; // O establecer algún valor por defecto
         }
-        // System.out.println("usuario1:" + nombreUsuario + " usuario2" + usuario2);
-        if (usuario1PTipoPartida != JOptionPane.YES_OPTION) {
-            userHero.setText("Usuario jugando con piezas de Villano: " + nombreUsuario);
-            userVillain.setText("Usuario jugando con piezas de Heroe: " + usuario2);
-            player1 = nombreUsuario;
-            player2 = usuario2;
-        } else {
-            userHero.setText("Usuario jugando con piezas de Heroe: " + nombreUsuario);
-            userVillain.setText("Usuario jugando con piezas de Villano: " + usuario2);
-            player1 = usuario2;
-            player2 = nombreUsuario;
-        }
-
+        
+        nameLabel = new JLabel("Nombre: ");
+        rankLabel = new JLabel("Rango: ");
+        imageLabel = new JLabel();
+        
         contadoresVH();
 
         // Configuración del JFrame
@@ -193,32 +189,37 @@ public class GameBoard extends JFrame {
 
         // Agrega un ActionListener al botón resignGame
         styleButton(resignGame, Color.RED, new Font("Arial", Font.BOLD, 14));
-        add(resignGame, BorderLayout.NORTH);
 
         JPanel southPanel = new JPanel();
         southPanel.setBorder(new EmptyBorder(1, 1, 1, 1)); // Agrega espaciado
+        JPanel TurnoP = new JPanel();
+        TurnoP.setBorder(new EmptyBorder(1, 1, 1, 1)); // Agrega espaciado
 
-        Font Arial = new Font("Arial", Font.PLAIN, 15); // Crea la fuente
+        Font Arial = new Font("Arial", Font.PLAIN, 18); // Crea la fuente
+        Font ArialT = new Font("Arial", Font.BOLD, 25); // Crea la fuente
 
         if (isHeroTurn) {
             turnLabel.setText("Turno de (Heroes): " + usuarioGPerfil);
         } else {
             turnLabel.setText("Turno de (Villanos): " + usuarioGPerfil);
         }
+        
+        turnLabel.setFont(ArialT); // Cambia el estilo de letra de turnLabel
+        nameLabel.setFont(Arial); // Cambia el estilo de letra de userHero
+        rankLabel.setFont(Arial); // Cambia el estilo de letra de userVillain
 
-        turnLabel.setFont(Arial); // Cambia el estilo de letra de turnLabel
-        userHero.setFont(Arial); // Cambia el estilo de letra de userHero
-        userVillain.setFont(Arial); // Cambia el estilo de letra de userVillain
+        nameLabel.setBorder(new EmptyBorder(10, 10, 10, 10)); // Agrega relleno
+        rankLabel.setBorder(new EmptyBorder(10, 10, 10, 10)); // Agrega relleno
 
-        userHero.setBorder(new EmptyBorder(10, 10, 10, 10)); // Agrega relleno
-        userVillain.setBorder(new EmptyBorder(10, 10, 10, 10)); // Agrega relleno
+        nameLabel.setForeground(Color.BLUE); // Cambia el color del texto de userHero a azul
+        rankLabel.setForeground(Color.RED); // Cambia el color del texto de userVillain a rojo
 
-        userHero.setForeground(Color.BLUE); // Cambia el color del texto de userHero a azul
-        userVillain.setForeground(Color.RED); // Cambia el color del texto de userVillain a rojo
-
-        southPanel.add(userHero);
-        southPanel.add(userVillain);
-        southPanel.add(turnLabel);
+        TurnoP.add(turnLabel);
+        TurnoP.add(resignGame);
+        add(TurnoP, BorderLayout.NORTH);
+        
+        southPanel.add(nameLabel);
+        southPanel.add(rankLabel);
         add(southPanel, BorderLayout.SOUTH);
         
         // Actualiza los paneles
@@ -260,6 +261,7 @@ public class GameBoard extends JFrame {
                     }
                 });
         add(eliminatedVillainsPanel, BorderLayout.WEST);
+        
         Boolean shouldEndForVillain = false;
         Boolean shouldEndForHero = false;
         List<String> excludeNames = Arrays.asList("Pumpkin", "Bomb Nova Blast", "Tierra", "Planet Tierra");
@@ -428,19 +430,52 @@ public class GameBoard extends JFrame {
                         Object[] options = { "Confirmar", "Cancelar" };
                         ImageIcon selectedImage = selectedCharacter.getImage();
                         ImageIcon targetImage = targetCharacter.getImage();
+                        int selectedRank = selectedCharacter.getPowerRating();
+                        int targetRank = targetCharacter.getPowerRating();
+
                         Object[] message = {
-                                "¿Estás seguro de que quieres luchar?", "Personaje seleccionado:",
-                                new JLabel(selectedImage), "Personaje objetivo:", new JLabel(targetImage) };
-                        int n = JOptionPane.showOptionDialog(this,
-                                message,
-                                "Confirmar lucha",
-                                JOptionPane.YES_NO_OPTION,
-                                JOptionPane.QUESTION_MESSAGE,
-                                null,
-                                options,
-                                options[1]);
+                            "¿Estás seguro de que quieres luchar?",
+                            "Personaje seleccionado:",
+                            new JLabel("Nombre: " + selectedCharacter.getName()),
+                            new JLabel("Rango: " + selectedRank),
+                            new JLabel(selectedImage),
+                            "Personaje objetivo:",
+                            new JLabel("Nombre: " + targetCharacter.getName()),
+                            new JLabel("Rango: " + targetRank),
+                            new JLabel(targetImage)
+                        };
+
+                        int n = JOptionPane.showOptionDialog(
+                            this,
+                            message,
+                            "Confirmar lucha",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE,
+                            null,
+                            options,
+                            options[1]
+                        );
 
                         if (n == JOptionPane.YES_OPTION) {
+                            // La lucha fue confirmada, determina el ganador
+                            Character winner = determineWinner(selectedCharacter, targetCharacter);
+
+                            // Muestra la información de la carta ganadora
+                            if (winner != null) {
+                                ImageIcon winnerImage = winner.getImage();
+                                int winnerRank = winner.getPowerRating();
+
+                                JOptionPane.showMessageDialog(
+                                    this,
+                                    "¡La carta ganadora es:\n" +
+                                    "Nombre: " + winner.getName() +
+                                    "\nRango: " + winnerRank,
+                                    "Carta Ganadora",
+                                    JOptionPane.INFORMATION_MESSAGE,
+                                    winnerImage
+                                );
+                            }
+                            
 
                             if (targetCharacter.getName().equals("Tierra")) {
                                 DateTimeFormatter fechapartida = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
@@ -449,7 +484,9 @@ public class GameBoard extends JFrame {
                                         "%s VENCEDOR usando VILLANOS ha CAPTURADO la tierra! Venciendo a %s PERDEDOR - %s",
                                         heroe, villano, fechapartida.format(fecha));
                                 JOptionPane.showMessageDialog(this, mensaje);
-                                this.listaLogs.add(new LogsInfo(mensaje, "Villanos"));
+                                if (!modoTutorial) {
+                                    this.listaLogs.add(new LogsInfo(mensaje, "Villanos"));
+                                }
                                 System.out.println("Tamaño de listaLogs después de agregar: " + listaLogs.size());
                                 close();
                                 puntosUsuarios();
@@ -469,7 +506,9 @@ public class GameBoard extends JFrame {
                                         "%s VENCEDOR usando HEROES ha SALVADO la tierra! Venciendo a %s PERDEDOR - %s",
                                         villano, heroe, fechapartida.format(fecha));
                                 JOptionPane.showMessageDialog(this, mensaje);
-                                this.listaLogs.add(new LogsInfo(mensaje, "Heroes"));
+                                if (!modoTutorial) {
+                                    this.listaLogs.add(new LogsInfo(mensaje, "Heroes"));
+                                }
                                 close();
                                 puntosUsuarios();
                                 MenuPrincipal menuPrincipal = new MenuPrincipal(this.listaUsuarios, this.listaLogs,
@@ -686,10 +725,12 @@ public class GameBoard extends JFrame {
                     perdedor, ganador, fechapartida.format(fecha));
 
             JOptionPane.showMessageDialog(this, mensaje);
-            if (isTurnoVillano()) {
-                this.listaLogs.add(new LogsInfo(mensaje, "Villanos"));
-            } else {
-                this.listaLogs.add(new LogsInfo(mensaje, "Heroes"));
+            if (!modoTutorial) {
+                if (isTurnoVillano()) {
+                    this.listaLogs.add(new LogsInfo(mensaje, "Villanos"));
+                } else {
+                    this.listaLogs.add(new LogsInfo(mensaje, "Heroes"));
+                }
             }
 
             puntosUsuarios();
@@ -717,10 +758,12 @@ public class GameBoard extends JFrame {
                         ganador, perdedor, fechapartida.format(fecha));
 
                 JOptionPane.showMessageDialog(this, mensaje);
-                if (isTurnoVillano()) {
-                    this.listaLogs.add(new LogsInfo(mensaje, "Villanos"));
-                } else {
-                    this.listaLogs.add(new LogsInfo(mensaje, "Heroes"));
+                if (!modoTutorial) {
+                    if (isTurnoVillano()) {
+                        this.listaLogs.add(new LogsInfo(mensaje, "Villanos"));
+                    } else {
+                        this.listaLogs.add(new LogsInfo(mensaje, "Heroes"));
+                    }
                 }
 
                 puntosUsuarios();
@@ -735,10 +778,12 @@ public class GameBoard extends JFrame {
     }
 
     private void sumarPuntos(String jugador, int puntos) {
-        for (UsuariosInfo usuario : this.listaUsuarios) {
-            if (usuario.getUsuarioG().equals(jugador)) {
-                usuario.setPuntos(usuario.getPuntos() + puntos);
-                break;
+        if (!modoTutorial) {
+            for (UsuariosInfo usuario : this.listaUsuarios) {
+                if (usuario.getUsuarioG().equals(jugador)) {
+                    usuario.setPuntos(usuario.getPuntos() + puntos);
+                    break;
+                }
             }
         }
     }
@@ -878,6 +923,7 @@ private void handleCharacterDeselection(int row, int col, boolean makeNull) {
 
     private void selectCharacter(int row, int col, Character character) {
         selectedCharacter = character;
+        updateInfo(selectedCharacter);
         System.out.println("Found character: " + character.getName());
 
         // Pinta el borde de verde cuando el personaje es seleccionado
@@ -894,15 +940,17 @@ private void handleCharacterDeselection(int row, int col, boolean makeNull) {
             villano = usuario2;
         }
 
-        for (int i = 0; i < this.listaUsuarios.size(); i++) {
-            if (listaUsuarios.get(i).getUsuarioG().equals(heroe)) {
-                listaUsuarios.get(i).setPuntos(listaUsuarios.get(i).getPuntos() + 3);
+        if (!modoTutorial) {
+            for (int i = 0; i < this.listaUsuarios.size(); i++) {
+                if (listaUsuarios.get(i).getUsuarioG().equals(heroe)) {
+                    listaUsuarios.get(i).setPuntos(listaUsuarios.get(i).getPuntos() + 3);
+                }
             }
-        }
 
-        for (int i = 0; i < this.listaUsuarios.size(); i++) {
-            if (listaUsuarios.get(i).getUsuarioG().equals(villano)) {
-                listaUsuarios.get(i).setPuntos(listaUsuarios.get(i).getPuntos() + 3);
+            for (int i = 0; i < this.listaUsuarios.size(); i++) {
+                if (listaUsuarios.get(i).getUsuarioG().equals(villano)) {
+                    listaUsuarios.get(i).setPuntos(listaUsuarios.get(i).getPuntos() + 3);
+                }
             }
         }
     }
@@ -918,8 +966,7 @@ private void handleCharacterDeselection(int row, int col, boolean makeNull) {
 
     private void eliminateCharacter(Character character, boolean deathByBomb, boolean mutualElim) {
 
-        buttons[selectedCharacter.getX()][selectedCharacter.getY()]
-                .setBorder(BorderFactory.createLineBorder(Color.black, 1));
+        buttons[selectedCharacter.getX()][selectedCharacter.getY()].setBorder(BorderFactory.createLineBorder(Color.black, 1));
         character.setAlive(false);
         // if villain change villain character array isAlive
         character.setX(-1);
@@ -953,17 +1000,19 @@ private void handleCharacterDeselection(int row, int col, boolean makeNull) {
             villano = usuario2;
         }
 
-        for (int i = 0; i < this.listaUsuarios.size(); i++) {
-            if (listaUsuarios.get(i).getUsuarioG().equals(villano)) {
-                System.out.println("Sumando a " + listaUsuarios.get(i).getUsuarioG());
-                listaUsuarios.get(i).setPartidasHeroes(listaUsuarios.get(i).getPartidasHeroes() + 1);
+        if (!modoTutorial) {
+            for (int i = 0; i < this.listaUsuarios.size(); i++) {
+                if (listaUsuarios.get(i).getUsuarioG().equals(villano)) {
+                    System.out.println("Sumando a " + listaUsuarios.get(i).getUsuarioG());
+                    listaUsuarios.get(i).setPartidasHeroes(listaUsuarios.get(i).getPartidasHeroes() + 1);
+                }
             }
-        }
 
-        for (int i = 0; i < this.listaUsuarios.size(); i++) {
-            if (listaUsuarios.get(i).getUsuarioG().equals(heroe)) {
-                System.out.println("Sumando a " + listaUsuarios.get(i).getUsuarioG());
-                listaUsuarios.get(i).setPartidasVillanos(listaUsuarios.get(i).getPartidasVillanos() + 1);
+            for (int i = 0; i < this.listaUsuarios.size(); i++) {
+                if (listaUsuarios.get(i).getUsuarioG().equals(heroe)) {
+                    System.out.println("Sumando a " + listaUsuarios.get(i).getUsuarioG());
+                    listaUsuarios.get(i).setPartidasVillanos(listaUsuarios.get(i).getPartidasVillanos() + 1);
+                }
             }
         }
     }
@@ -988,6 +1037,36 @@ private void handleCharacterDeselection(int row, int col, boolean makeNull) {
         for (Character villain : villains) {
             villain.setImage(isHeroTurn ? cardBackgroundImagesV : villainsOriginalImages.get(contCharacterVillain));
             contCharacterVillain++;
+        }
+    }
+    
+    public void updateInfo(Character character) {
+        if (character != null) {
+            nameLabel.setText("Nombre: " + character.getName());
+            rankLabel.setText("Rango: " + character.getPowerRating());
+            imageLabel.setIcon(character.getImage());
+        } else {
+            // Si no hay personaje seleccionado, puedes borrar o desactivar los JLabel
+            nameLabel.setText("Nombre: ");
+            rankLabel.setText("Rango: ");
+            imageLabel.setIcon(null);
+        }
+    }
+    
+    private Character determineWinner(Character selectedCharacter, Character targetCharacter) {
+        // Implement your logic to determine the winner
+        // For example, compare their power ratings
+
+        int selectedPower = selectedCharacter.getPowerRating();
+        int targetPower = targetCharacter.getPowerRating();
+
+        if (selectedPower > targetPower) {
+            return selectedCharacter;
+        } else if (selectedPower < targetPower) {
+            return targetCharacter;
+        } else {
+            // Handle a tie or any additional logic
+            return null;
         }
     }
 
