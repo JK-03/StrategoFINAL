@@ -14,10 +14,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
-import java.awt.Font;
-import javax.swing.BorderFactory;
+
 import javax.swing.border.EmptyBorder;
-import java.awt.Color;
+import javax.swing.border.LineBorder;
 
 public class GameBoard extends JFrame {
     ArrayList<UsuariosInfo> listaUsuarios;
@@ -303,9 +302,9 @@ public class GameBoard extends JFrame {
 
                             // Establece el borde azul si es un héroe, rojo si no lo es
                             if (character.isHero()) {
-                                setBorder(BorderFactory.createLineBorder(Color.BLUE, 1));
+                                //setBorder(BorderFactory.createLineBorder(Color.BLUE, 1));
                             } else {
-                                setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+                                //setBorder(BorderFactory.createLineBorder(Color.RED, 1));
                             }
 
                             // Si el personaje está seleccionado, establece el borde verde
@@ -346,6 +345,7 @@ public class GameBoard extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     JOptionPane.showMessageDialog(null, "¡Zona prohibida!", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                    //handleCharacterDeselection(row, col);
                 }
             });
         } else {
@@ -399,7 +399,7 @@ public class GameBoard extends JFrame {
         }
 
         if (selectedCharacter.getX() == row && selectedCharacter.getY() == col) {
-            handleCharacterDeselection(row, col);
+            handleCharacterDeselection(row, col, true);
         } else {
             boolean isEmpty = isCellEmpty(row, col);
             boolean isAdjacent = (selectedCharacter.getX() == row && Math.abs(selectedCharacter.getY() - col) == 1) ||
@@ -451,6 +451,7 @@ public class GameBoard extends JFrame {
                                 JOptionPane.showMessageDialog(this, mensaje);
                                 this.listaLogs.add(new LogsInfo(mensaje, "Villanos"));
                                 System.out.println("Tamaño de listaLogs después de agregar: " + listaLogs.size());
+                                close();
                                 puntosUsuarios();
 
                                 MenuPrincipal menuPrincipal = new MenuPrincipal(this.listaUsuarios, this.listaLogs,usuarioGPerfil, this.listaUsuariosEliminados, modoTutorial);
@@ -469,6 +470,7 @@ public class GameBoard extends JFrame {
                                         villano, heroe, fechapartida.format(fecha));
                                 JOptionPane.showMessageDialog(this, mensaje);
                                 this.listaLogs.add(new LogsInfo(mensaje, "Heroes"));
+                                close();
                                 puntosUsuarios();
                                 MenuPrincipal menuPrincipal = new MenuPrincipal(this.listaUsuarios, this.listaLogs,
                                         usuarioGPerfil, this.listaUsuariosEliminados, modoTutorial);
@@ -759,26 +761,87 @@ public class GameBoard extends JFrame {
 
         return true;
     }
-
     private void handleCharacterSelection(int row, int col) {
         for (Character character : characters) {
             if (character.getX() == row && character.getY() == col && character.getMoveable()) {
                 if ((character.isHero() && isHeroTurn) || (!character.isHero() && !isHeroTurn)) {
                     selectCharacter(row, col, character);
+    
+                    // Only highlight in green all the cells he can move to if modoTutorial is true
+                    if (modoTutorial) {
+                        for (int i = 0; i < 10; i++) {
+                            for (int j = 0; j < 10; j++) {
+                                // Check if the target cell is not in the yellow or magenta zones
+                                if (!isRestrictedZone(i, j)) {
+                                    // Use the same logic from canMoveToCell to determine if the cell should be highlighted
+                                    if (canMoveToCell(character.getX(), character.getY(), i, j)) {
+                                        buttons[i][j].setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
+                                    }
+                                }
+                            }
+                        }
+                    }
                     break;
                 }
             }
         }
+    } 
+
+// Helper method to check if the cell is in the restricted zone (yellow and magenta)
+private boolean isRestrictedZone(int i, int j) {
+    return (i >= 4 && i <= 5 && j >= 2 && j <= 3) || (i >= 4 && i <= 5 && j >= 6 && j <= 7);
+}
+
+private boolean canMoveToCell(int currentRow, int currentCol, int targetRow, int targetCol) {
+    boolean isEmpty = isCellEmpty(targetRow, targetCol);
+    boolean isAdjacent = (currentRow == targetRow && Math.abs(currentCol - targetCol) == 1) ||
+            (currentCol == targetCol && Math.abs(currentRow - targetRow) == 1);
+    boolean canMove = isAdjacent;
+
+    if (selectedCharacter.getPowerRating() == 2 && !isAdjacent) {
+        canMove = (currentRow == targetRow || currentCol == targetCol)
+                && isPathClear(currentRow, currentCol, targetRow, targetCol);
     }
 
-    private void handleCharacterDeselection(int row, int col) {
-        // Restaura el color del borde dependiendo de si el personaje es un héroe o no
-        buttons[row][col]
-                .setBorder(BorderFactory.createLineBorder(selectedCharacter.isHero() ? Color.BLUE : Color.RED, 1));
-
-        selectedCharacter = null;
-        // isHeroTurn = !isHeroTurn;
+    if (!isEmpty) {
+        Character targetCharacter = getCharacterAtLocation(targetRow, targetCol);
+        if (targetCharacter != null && targetCharacter.isHero() != selectedCharacter.isHero()) {
+            canMove = true;
+        }
+    } else {
+        if (isCharacterPresent(targetRow, targetCol)) {
+            canMove = false;
+        }
     }
+
+    return isEmpty && canMove;
+}
+private boolean isCharacterPresent(int row, int col) {
+    for (Character character : characters) {
+        if (character.getX() == row && character.getY() == col) {
+            return true;
+        }
+    }
+    return false;
+}
+private void handleCharacterDeselection(int row, int col, boolean makeNull) {
+    // Restaura el color del borde dependiendo de si el personaje es un héroe o no
+    // buttons[row][col].setBorder(BorderFactory.createLineBorder(selectedCharacter.isHero() ? Color.BLUE : Color.RED, 1));
+
+    // Dehighlight all green cells
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                Color borderColor = ((LineBorder) buttons[i][j].getBorder()).getLineColor();
+                if (borderColor == Color.GREEN) {
+                    buttons[i][j].setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+                }
+            }
+        }if(makeNull){
+            selectedCharacter = null;
+
+        }
+    // isHeroTurn = !isHeroTurn;
+}
 
     private boolean isCellEmpty(int row, int col) {
         for (Character character : characters) {
@@ -802,7 +865,10 @@ public class GameBoard extends JFrame {
 
         buttons[oldX][oldY].setBorder(BorderFactory.createLineBorder(Color.black, 1));
 
+        handleCharacterDeselection(oldX, oldY, false);
+        handleCharacterDeselection(row, col, false);
         selectedCharacter = null;
+        
         revalidate();
         if (!modoTutorial) {
             changeCardBackgrounds();
