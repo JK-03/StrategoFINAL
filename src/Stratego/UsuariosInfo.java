@@ -20,7 +20,7 @@ import java.util.List;
 public class UsuariosInfo {
 
     String usuarioG, contraG;
-    int puntos, partidasVillanos, partidasHeroes = 0;
+    int puntos, partidasVillanos=0, partidasHeroes = 0;
     boolean Activo=true;
 
     public UsuariosInfo(String usuario, String contra) {

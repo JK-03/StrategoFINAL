@@ -41,16 +41,15 @@ public class MiPerfil extends javax.swing.JFrame {
         this.modoTutorial = ModoJuego;
 
         // Iterar sobre la lista de usuarios para obtener información del usuario actual
-        for (UsuariosInfo usuario : listaUsuarios) {
+        for (int i = 0; i < listaUsuarios.size(); i++) {
             // Verificar si el usuario actual coincide con el nombre de usuario proporcionado
-            if (usuario.getUsuarioG().equals(nombreUsuario)) {
-                // Asignar puntos del usuario actual a la variable de instancia 'puntos'
-                puntos = usuario.getPuntos();
+            if (this.listaUsuarios.get(i).getUsuarioG().equals(usuarioGPerfil)) {
+                puntos = this.listaUsuarios.get(i).getPuntos();
             }
 
             // Asignar partidas de héroes y villanos del usuario actual a las variables de instancia correspondientes
-            partidasHeroes = usuario.getPartidasHeroes();
-            partidasVillanos = usuario.getPartidasVillanos();
+            partidasHeroes = this.listaUsuarios.get(i).getPartidasHeroes();
+            partidasVillanos = this.listaUsuarios.get(i).getPartidasVillanos();
         }
         
         initComponents();

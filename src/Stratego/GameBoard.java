@@ -110,23 +110,39 @@ public class GameBoard extends JFrame {
 
         // Selección del bando
         Object[] options = { "Héroes", "Villanos" };
-        int usuario1PTipoPartida = JOptionPane.showOptionDialog(this, "¿Con qué bando prefieres jugar?", "Elegir bando", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-        this.usuario1PTipoPartida = usuario1PTipoPartida;
-        
-        System.out.println(usuario1PTipoPartida);
-        if (usuario1PTipoPartida != JOptionPane.YES_OPTION) {
-            isHeroTurn = false;
+        int n = JOptionPane.showOptionDialog(this, "¿Con qué bando prefieres jugar?", "Elegir bando", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+
+        // Configurar la variable isHeroTurn para el primer usuario
+        boolean isHeroTurn = (n == JOptionPane.YES_OPTION);
+
+        // Mostrar un JOptionPane indicando qué jugador es villano y cuál es héroe
+        String message;
+        String heroPlayer;
+        String villainPlayer;
+
+        if (isHeroTurn) {
+            heroPlayer = "Jugador 1";
+            villainPlayer = "Jugador 2";
+        } else {
+            heroPlayer = "Jugador 2";
+            villainPlayer = "Jugador 1";
         }
-        
+
+        message = String.format("%s es el Héroe y %s es el Villano.", heroPlayer, villainPlayer);
+        JOptionPane.showMessageDialog(this, message, "Información de Jugadores", JOptionPane.INFORMATION_MESSAGE);
+
         // Selección del segundo usuario
         String[] nombreUsuarios2 = new String[listaUsuarios.size() - 1];
         int cont = 0;
+
         for (int i = 0; i < listaUsuarios.size(); i++) {
             if (!listaUsuarios.get(i).getUsuarioG().equals(this.usuarioGPerfil)) {
                 nombreUsuarios2[cont] = listaUsuarios.get(i).getUsuarioG();
                 cont++;
             }
         }
+
+        String usuario2;
 
         if (cont > 0) {
             usuario2 = (String) JOptionPane.showInputDialog(null, "Escoja el usuario", "", JOptionPane.QUESTION_MESSAGE, null, nombreUsuarios2, nombreUsuarios2[0]);
@@ -136,7 +152,9 @@ public class GameBoard extends JFrame {
 
             // Puedes establecer un valor por defecto para usuario2 o manejarlo de otra manera según tu lógica
             usuario2 = ""; // O establecer algún valor por defecto
-        }
+        } 
+        
+        contadoresVH();
         
         // Configuración del JFrame
         setTitle("Stratego - Marvel Heroes");
@@ -326,17 +344,21 @@ public class GameBoard extends JFrame {
     private boolean villanosGanaron = false;
 
     private void handleCharacterMove(int row, int col) {
-        
-        
+        String villano = "", heroe = "";
+        if (usuario1PTipoPartida == 0) {
+            villano = usuarioGPerfil;
+            heroe = usuario2;
+        } else {
+            heroe = usuarioGPerfil;
+            villano = usuario2;
+        }
         
         if (selectedCharacter.getX() == row && selectedCharacter.getY() == col) {
             handleCharacterDeselection(row, col);
         } else {
             boolean isEmpty = isCellEmpty(row, col);
-
             boolean isAdjacent = (selectedCharacter.getX() == row && Math.abs(selectedCharacter.getY() - col) == 1) ||
                     (selectedCharacter.getY() == col && Math.abs(selectedCharacter.getX() - row) == 1);
-
             boolean canMove = isAdjacent;
 
             if (selectedCharacter.getPowerRating() == 2 && !isAdjacent) {
@@ -346,9 +368,7 @@ public class GameBoard extends JFrame {
 
             if (isEmpty && canMove) {
                 Character targetCharacter = getCharacterAtLocation(row, col);
-
                 moveCharacter(row, col);
-
                 isHeroTurn = !isHeroTurn;
                 
             } else if (isAdjacent || selectedCharacter.getPowerRating() == 2) {
@@ -373,14 +393,35 @@ public class GameBoard extends JFrame {
                         if (n == JOptionPane.YES_OPTION) {
 
                             if (targetCharacter.getName().equals("Tierra")) {
+                                DateTimeFormatter fechapartida = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                                LocalDateTime fecha = LocalDateTime.now();
+                                String mensaje = String.format("%s VENCEDOR usando VILLANOS ha CAPTURADO la tierra! Venciendo a %s PERDEDOR - %s",
+                                        heroe, villano, fechapartida.format(fecha));
+                                JOptionPane.showMessageDialog(this, mensaje);
+                                this.listaLogs.add(new LogsInfo(mensaje, "Villanos"));
+                                System.out.println("Tamaño de listaLogs después de agregar: " + listaLogs.size());
+                                puntosUsuarios();
+
+                                MenuPrincipal menuPrincipal = new MenuPrincipal(this.listaUsuarios, this.listaLogs, usuarioGPerfil,this.listaUsuariosEliminados, modoTutorial);
+                                menuPrincipal.setVisible(true);
+                                this.setVisible(false);
                                 
-                                JOptionPane.showMessageDialog(this, "Villains win!");
                                 villanosGanaron = true;
                                 //MenuPrincipal menuPrincipal = new MenuPrincipal(listaUsuarios, listaLogs, usuarioGPerfil,listaUsuariosEliminados, modoTutorial);
                                 //close();
                             } else if (targetCharacter.getName().equals("Planet Tierra")) {
-                                // endGame();
-                                JOptionPane.showMessageDialog(this, "Heroes win! +3 points");
+                                DateTimeFormatter fechapartida = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                                LocalDateTime fecha = LocalDateTime.now();
+                                String mensaje = String.format("%s VENCEDOR usando HEROES ha SALVADO la tierra! Venciendo a %s PERDEDOR - %s",
+                                        villano, heroe, fechapartida.format(fecha));
+                                JOptionPane.showMessageDialog(this, mensaje);
+                                this.listaLogs.add(new LogsInfo(mensaje, "Heroes"));
+                                puntosUsuarios();
+                                MenuPrincipal menuPrincipal = new MenuPrincipal(this.listaUsuarios, this.listaLogs, usuarioGPerfil,this.listaUsuariosEliminados, modoTutorial);
+                                menuPrincipal.setVisible(true);
+                                this.setVisible(false);
+                                partidasjugadasheroes++;
+                                
                                 heroesGanaron = true;
                             } else if ((selectedCharacter.getPowerRating() != 3 && (targetCharacter.getName().equals("Nova Blast") || targetCharacter.getName().equals("Pumpkin Bomb")))) {
                                 if ((!targetCharacter.isHero() && isHeroTurn) || (targetCharacter.isHero() && !isHeroTurn)) {
@@ -409,8 +450,7 @@ public class GameBoard extends JFrame {
                             } else if (selectedCharacter.getPowerRating() == 2) {
                                 // Check if the move is in a straight line horizontally or vertically
                                 if (selectedCharacter.getX() == row || selectedCharacter.getY() == col) {
-                                    // Check if there is any character between the current position and the target
-                                    // position
+                                    // Check if there is any character between the current position and the target position
                                     int xDirection = Integer.compare(row, selectedCharacter.getX());
                                     int yDirection = Integer.compare(col, selectedCharacter.getY());
 
@@ -433,8 +473,7 @@ public class GameBoard extends JFrame {
                                     targetCharacter = getCharacterAtLocation(row, col);
                                     if (targetCharacter != null) {
                                         if (selectedCharacter.isHero() == targetCharacter.isHero()) {
-                                            // The target position is occupied by a character of the same type, so the
-                                            // move is not allowed
+                                            // The target position is occupied by a character of the same type, so the move is not allowed
                                             System.out.println("Movimiento incorrecto");
                                             return;
                                         } else if (selectedCharacter.getPowerRating() == targetCharacter
@@ -442,11 +481,9 @@ public class GameBoard extends JFrame {
                                             // If they have the same powerRating, they eliminate each other
                                             List<Character> charactersToEliminate = new ArrayList<>();
                                             charactersToEliminate.add(targetCharacter);
-                                            buttons[targetCharacter.getX()][targetCharacter.getY()]
-                                                    .setBorder(BorderFactory.createLineBorder(Color.black, 1));
+                                            buttons[targetCharacter.getX()][targetCharacter.getY()].setBorder(BorderFactory.createLineBorder(Color.black, 1));
                                             charactersToEliminate.add(selectedCharacter);
-                                            buttons[selectedCharacter.getX()][selectedCharacter.getY()]
-                                                    .setBorder(BorderFactory.createLineBorder(Color.black, 1));
+                                            buttons[selectedCharacter.getX()][selectedCharacter.getY()].setBorder(BorderFactory.createLineBorder(Color.black, 1));
                                             for (Character character : charactersToEliminate) {
                                                 eliminateCharacter(character, false, true);
                                             }
@@ -484,14 +521,10 @@ public class GameBoard extends JFrame {
                                     return;
                                 }
                             } else if (selectedCharacter.getPowerRating() > targetCharacter.getPowerRating() ||
-                                    (selectedCharacter.getPowerRating() == 3 &&
-                                            (targetCharacter.getName().equals("Nova Blast")
-                                                    || targetCharacter.getName().equals("Pumpkin Bomb")))
+                                    (selectedCharacter.getPowerRating() == 3 && (targetCharacter.getName().equals("Nova Blast") || targetCharacter.getName().equals("Pumpkin Bomb")))
                                     ||
-                                    (selectedCharacter.getPowerRating() == 1
-                                            && targetCharacter.getPowerRating() == 10)) {
-                                if ((!targetCharacter.isHero() && isHeroTurn)
-                                        || (targetCharacter.isHero() && !isHeroTurn)) {
+                                    (selectedCharacter.getPowerRating() == 1 && targetCharacter.getPowerRating() == 10)) {
+                                if ((!targetCharacter.isHero() && isHeroTurn) || (targetCharacter.isHero() && !isHeroTurn)) {
                                     eliminateCharacter(targetCharacter, false, false);
                                     moveCharacter(row, col);
                                     isHeroTurn = !isHeroTurn;
@@ -502,7 +535,6 @@ public class GameBoard extends JFrame {
                                 selectedCharacter = null; // Permitir la selección de otra pieza
                                 if (!modoTutorial) {
                                     changeCardBackgrounds();
-
                                 }
                                 updatePanels();
                                 revalidate();
@@ -550,12 +582,6 @@ public class GameBoard extends JFrame {
     private void endGame() {
         // Handle the game ending logic here
         String villano = "", heroe = "";
-        
-        System.out.println("Usuario1PTipoPartida: " + usuario1PTipoPartida);
-    System.out.println("UsuarioGPerfil: " + usuarioGPerfil);
-    System.out.println("Usuario2: " + usuario2);
-
-        System.out.println("entra");
         if (usuario1PTipoPartida == 0) {
             villano = usuarioGPerfil;
             heroe = usuario2;
@@ -565,34 +591,46 @@ public class GameBoard extends JFrame {
         }
 
         int option = JOptionPane.showConfirmDialog(null, "¿Desea retirarse del juego?", "Confirmación", JOptionPane.YES_NO_OPTION);
-
         if (option == JOptionPane.YES_OPTION && villano.equals(usuarioGPerfil) && usuario1PTipoPartida == 0) {
-        DateTimeFormatter fechapartida = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-        LocalDateTime fecha = LocalDateTime.now();
-        String mensaje = String.format("%s VENCEDOR usando VILLANOS ha ganado ya que %s PERDEDOR usando HEROES se ha retirado del juego - %s",
-                heroe, villano, fechapartida.format(fecha));
-        JOptionPane.showMessageDialog(this, mensaje);
-        this.listaLogs.add(new LogsInfo(mensaje, "Villanos"));
-        System.out.println("Tamaño de listaLogs después de agregar: " + listaLogs.size());
+            for (int i = 0; i < this.listaUsuarios.size(); i++) {
+                if (listaUsuarios.get(i).getUsuarioG().equals(heroe)) {
+                    listaUsuarios.get(i).setPuntos(listaUsuarios.get(i).getPuntos() + 3);
+                }
+            }
+            
+            DateTimeFormatter fechapartida = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            LocalDateTime fecha = LocalDateTime.now();
+            String mensaje = String.format("%s VENCEDOR usando VILLANOS ha ganado ya que %s PERDEDOR usando HEROES se ha retirado del juego - %s",
+                    heroe, villano, fechapartida.format(fecha));
+            JOptionPane.showMessageDialog(this, mensaje);
+            this.listaLogs.add(new LogsInfo(mensaje, "Villanos"));
+            System.out.println("Tamaño de listaLogs después de agregar: " + listaLogs.size());
 
-        MenuPrincipal menuPrincipal = new MenuPrincipal(this.listaUsuarios, this.listaLogs, usuarioGPerfil,this.listaUsuariosEliminados, modoTutorial);
-        menuPrincipal.setVisible(true);
-        this.setVisible(false);
-        partidasjugadasvillanos++;
+            MenuPrincipal menuPrincipal = new MenuPrincipal(this.listaUsuarios, this.listaLogs, usuarioGPerfil,this.listaUsuariosEliminados, modoTutorial);
+            menuPrincipal.setVisible(true);
+            this.setVisible(false);
+            partidasjugadasvillanos++;
+
+        } else if (option == JOptionPane.YES_OPTION) {
+            for (int i = 0; i < this.listaUsuarios.size(); i++) {
+                if (listaUsuarios.get(i).getUsuarioG().equals(villano)) {
+                    listaUsuarios.get(i).setPuntos(listaUsuarios.get(i).getPuntos() + 3);
+                }
+            }
+            
+            DateTimeFormatter fechapartida = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            LocalDateTime fecha = LocalDateTime.now();
+            String mensaje = String.format("%s VENCEDOR usando HEROES ha ganado ya que %s PERDEDOR usando VILLANOS se ha retirado del juego - %s",
+                    villano, heroe, fechapartida.format(fecha));
+            JOptionPane.showMessageDialog(this, mensaje);
+            this.listaLogs.add(new LogsInfo(mensaje, "Heroes"));
+            MenuPrincipal menuPrincipal = new MenuPrincipal(this.listaUsuarios, this.listaLogs, usuarioGPerfil,this.listaUsuariosEliminados, modoTutorial);
+            menuPrincipal.setVisible(true);
+            this.setVisible(false);
+            partidasjugadasheroes++;
+        }
         
         
-    } else if (option == JOptionPane.YES_OPTION) {
-        DateTimeFormatter fechapartida = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-        LocalDateTime fecha = LocalDateTime.now();
-        String mensaje = String.format("%s VENCEDOR usando HEROES ha ganado ya que %s PERDEDOR usando VILLANOS se ha retirado del juego - %s",
-                villano, heroe, fechapartida.format(fecha));
-        JOptionPane.showMessageDialog(this, mensaje);
-        this.listaLogs.add(new LogsInfo(mensaje, "Heroes"));
-        MenuPrincipal menuPrincipal = new MenuPrincipal(this.listaUsuarios, this.listaLogs, usuarioGPerfil,this.listaUsuariosEliminados, modoTutorial);
-        menuPrincipal.setVisible(true);
-        this.setVisible(false);
-        partidasjugadasheroes++;
-    }
 
         close();
     }
@@ -668,6 +706,29 @@ public class GameBoard extends JFrame {
         buttons[row][col].setBorder(BorderFactory.createLineBorder(Color.GREEN, 10));
     }
 
+    private void puntosUsuarios() {
+        String villano = "", heroe = "";
+        if (usuario1PTipoPartida == 0) {
+            villano = usuarioGPerfil;
+            heroe = usuario2;
+        } else {
+            heroe = usuarioGPerfil;
+            villano = usuario2;
+        }
+        
+        for (int i = 0; i < this.listaUsuarios.size(); i++) {
+                    if (listaUsuarios.get(i).getUsuarioG().equals(heroe)) {
+                        listaUsuarios.get(i).setPuntos(listaUsuarios.get(i).getPuntos() + 3);
+                    }
+        }
+
+        for (int i = 0; i < this.listaUsuarios.size(); i++) {
+                    if (listaUsuarios.get(i).getUsuarioG().equals(villano)) {
+                        listaUsuarios.get(i).setPuntos(listaUsuarios.get(i).getPuntos() + 3);
+                    }
+        }
+    }
+    
     private Character getCharacterAtLocation(int row, int col) {
         for (Character character : characters) {
             if (character.getX() == row && character.getY() == col) {
@@ -703,7 +764,32 @@ public class GameBoard extends JFrame {
         }
 
     }
+    
+    private void contadoresVH() {
+        String villano = "", heroe = "";
+        if (usuario1PTipoPartida == 0) {
+            villano = usuarioGPerfil;
+            heroe = usuario2;
+        } else {
+            heroe = usuarioGPerfil;
+            villano = usuario2;
+        }
+        
+        for (int i = 0; i < this.listaUsuarios.size(); i++) {
+                    if (listaUsuarios.get(i).getUsuarioG().equals(heroe)) {
+                        listaUsuarios.get(i).setPartidasHeroes(listaUsuarios.get(i).getPartidasHeroes() + 1);
+                    }
+        }
 
+        for (int i = 0; i < this.listaUsuarios.size(); i++) {
+                    if (listaUsuarios.get(i).getUsuarioG().equals(villano)) {
+                        listaUsuarios.get(i).setPartidasVillanos(listaUsuarios.get(i).getPartidasVillanos() + 1);
+                    }
+        }
+        
+        System.out.println();
+    }
+            
     private void styleButton(JButton button, Color color, Font font) {
         button.setBackground(color);
         button.setForeground(Color.WHITE);
