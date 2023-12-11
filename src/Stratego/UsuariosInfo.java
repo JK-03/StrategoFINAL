@@ -20,15 +20,12 @@ import java.util.List;
 public class UsuariosInfo {
 
     String usuarioG, contraG;
-    private int puntos, partidasVillanos, partidasHeroes = 0;
+    int puntos, partidasVillanos, partidasHeroes = 0;
     boolean Activo=true;
 
     public UsuariosInfo(String usuario, String contra) {
         usuarioG = usuario;
         contraG = contra;
-        puntos=0;
-        partidasHeroes=0;
-        partidasVillanos=0;
     }
 
     public String getUsuarioG() {

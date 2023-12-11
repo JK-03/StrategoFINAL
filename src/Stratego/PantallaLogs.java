@@ -24,19 +24,23 @@ public class PantallaLogs extends javax.swing.JFrame {
     String usuarioGPerfil;
     
     public PantallaLogs(ArrayList<UsuariosInfo> listaUsuariosExterna, ArrayList<LogsInfo> listaLogsExterna, String nombreUsuario, ArrayList<UsuariosEliminadosInfo> listaUsuariosEliminadosExterna, boolean ModoJuego) {
-        
         usuarioGPerfil = nombreUsuario;
         this.listaUsuarios = listaUsuariosExterna;
         listaUsuariosEliminados = listaUsuariosEliminadosExterna;
         this.listaLogs = listaLogsExterna;
         this.modoTutorial = ModoJuego;
-        
+
         initComponents();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1180, 626);
         setLocationRelativeTo(null);
-        setVisible(true);                 
-
+        setVisible(true);     
+        
+        String RegistrosCompletos="";
+        for(int indice=0;indice<this.listaLogs.size();indice++){
+          RegistrosCompletos+=listaLogs.get(indice).getGanadorG()+" "+listaLogs.get(indice).getRegistroG()+" "+"\n"; 
+        }
+        LogsSalida.setText(RegistrosCompletos);
     }
 
     /**

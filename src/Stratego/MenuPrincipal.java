@@ -152,6 +152,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         MiPerfil miPerfil = new MiPerfil(this.listaUsuarios, this.listaLogs, nombreUsuario,this.listaUsuariosEliminados,modoTutorial);
         miPerfil.setVisible(true);
         this.setVisible(false);
+
     }//GEN-LAST:event_BotonMiPerfilMouseClicked
 
     private void BotonUniversoMarvelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonUniversoMarvelMouseClicked
