@@ -54,12 +54,14 @@ public class CrearPlayer extends javax.swing.JFrame {
     private void inicializarListaUsuariosEliminados(ArrayList<UsuariosEliminadosInfo> listaUsuariosEliminadosExterna) {
         listaUsuariosEliminados = (listaUsuariosEliminadosExterna == null) ? new ArrayList<>() : listaUsuariosEliminadosExterna;
 
+        /*
         if (listaUsuariosEliminadosExterna == null) {
             listaUsuariosEliminados.add(new UsuariosEliminadosInfo("kris3", "kris3"));
             listaUsuariosEliminados.add(new UsuariosEliminadosInfo("karla05", "12345"));
             listaUsuariosEliminados.add(new UsuariosEliminadosInfo("lopez", "hola5"));
             System.out.println("Usuarios eliminados inicializados.");
         }
+        */
     }
     /**
      * This method is called from within the constructor to initialize the form.

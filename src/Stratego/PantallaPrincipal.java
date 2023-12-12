@@ -115,6 +115,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     private void inicializarListaUsuarios(ArrayList<UsuariosInfo> listaUsuariosExterna) {
         listaUsuarios = (listaUsuariosExterna == null) ? new ArrayList<>() : listaUsuariosExterna;
 
+        /*
         if (listaUsuariosExterna==null) {
             // Agregar algunos usuarios predeterminados
             listaUsuarios.add(new UsuariosInfo("kris3", "kris3"));
@@ -122,6 +123,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
             listaUsuarios.add(new UsuariosInfo("lopez", "hola5"));
             listaUsuarios.add(new UsuariosInfo("a", "12345"));
         }
+        */
     }
     
     private void inicializarListaLogs(ArrayList<LogsInfo> listaLogsExterna) {
@@ -131,6 +133,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     private void inicializarListaUsuariosEliminados(ArrayList<UsuariosEliminadosInfo> listaUsuariosEliminadosExterna) {
         this.listaUsuariosEliminados = (listaUsuariosEliminadosExterna == null) ? new ArrayList<>() : listaUsuariosEliminadosExterna;
 
+        /*
         if (listaUsuariosEliminadosExterna == null) {
             listaUsuariosEliminados.add(new UsuariosEliminadosInfo("kris3", "kris3"));
             listaUsuariosEliminados.add(new UsuariosEliminadosInfo("karla05", "12345"));
@@ -144,6 +147,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
             historialUsuariosBuilder.append("\n");
         }
         System.out.println(historialUsuariosBuilder.toString());
+        */
     }
     
     private void XdeSalidaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_XdeSalidaMouseClicked
