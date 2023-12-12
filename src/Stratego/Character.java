@@ -94,9 +94,6 @@ public class Character {
         return show;
     }
 
-
-    
-
     // Setter methods
     public void setName(String name) {
         this.name = name;
